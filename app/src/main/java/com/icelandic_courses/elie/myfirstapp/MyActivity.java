@@ -8,6 +8,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
+import com.icelandic_courses.elie.myfirstapp.animation.NoAnimationLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
+import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
+
 public class MyActivity extends Activity {
 
     public final static String EXTRA_MESSAGE = "com.icelandic_courses.elie.myfirstapp.MESSAGE";
@@ -16,6 +21,10 @@ public class MyActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ILogic logic = new TimedLogic(8);
+        IAnimationLogic animationLogic = new NoAnimationLogic(logic);
+        logic.start();
     }
 
     @Override
