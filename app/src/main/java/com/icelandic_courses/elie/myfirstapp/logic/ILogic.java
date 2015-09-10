@@ -9,11 +9,20 @@ import java.util.List;
  */
 public interface ILogic {
 
+    //game flow
     public void start();
-    public void traceFinished(Position<Integer>[] trace);
+    public void traceFinished(Position<Integer>[] trace) throws IllegalArgumentException;
     public void finish();
 
+    //Getter
+    public LogicDot getDot(Position<Integer> position);
+    public int getPitchSize();
+
+    //Handler
     public void registerDotsChangeHandler(DotsChangeHandler dotsChangeHandler);
     public void unregisterDotsChangeHandler(DotsChangeHandler dotsChangeHandler);
+
+    public void registerGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler);
+    public void unregisterGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler);
 
 }

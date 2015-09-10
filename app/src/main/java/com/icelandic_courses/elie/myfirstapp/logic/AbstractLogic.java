@@ -1,14 +1,12 @@
 package com.icelandic_courses.elie.myfirstapp.logic;
 
-import android.util.Log;
-
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceChecker;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,16 +15,26 @@ import java.util.Set;
 public abstract class AbstractLogic implements ILogic {
 
     private final Collection<DotsChangeHandler> dotsChangeHandlers;
+    private final Collection<GameStateChangeHandler> gameStateChangeHandlers;
 
     private final ScoreManager scoreManager;
+    private GameState gameState = GameState.NOT_STARTED;
     private final int pitchSize;
+    private final int numberDotColors;
     private LogicDot pitch[][];
 
-    public AbstractLogic(int pitchSize) {
+    /**
+     * Abstract class for different implementations of game types.
+     * @param pitchSize size of the pitch in horizontal and vertical orientation
+     * @param numberDotColors number of different colors a dot can have
+     */
+    public AbstractLogic(int pitchSize, int numberDotColors) {
         this.pitchSize = pitchSize;
+        this.numberDotColors = numberDotColors;
         pitch = new LogicDot[pitchSize][pitchSize];
         scoreManager = new ScoreManager();
         dotsChangeHandlers = new ArrayList<DotsChangeHandler>();
+        gameStateChangeHandlers = new ArrayList<GameStateChangeHandler>();
     }
 
     @Override
@@ -35,23 +43,28 @@ public abstract class AbstractLogic implements ILogic {
         for(int column = 0; column < pitchSize; column++) {
             createDots(column);
         }
+
+        //change game state
+        setGameState(GameState.RUNNING);
     }
 
     @Override
-    public void traceFinished(Position<Integer>[] trace) {
-        //maybe check trace before
+    public synchronized void traceFinished(Position<Integer>[] trace) throws IllegalArgumentException {
+        if (gameState != GameState.RUNNING) {
+            return; //do nothing, if the game is not running
+        }
+
+
+        TraceChecker.check(trace, this);
         int[] affectedColumns = removeDots(trace);
-        Log.i("Removed", toString());
         shiftDown(affectedColumns);
-        Log.i("Moved", toString());
         createDots(affectedColumns);
-        Log.i("Created", toString());
         scoreManager.addTrace(trace);
     }
 
     @Override
     public void finish() {
-        //TODO
+        setGameState(GameState.FINISHED);
     }
 
     /**
@@ -82,7 +95,14 @@ public abstract class AbstractLogic implements ILogic {
      * @param position
      */
     protected void removeDot(Position<Integer> position) {
+        //cache dot to notify listeners
         LogicDot dot = getDot(position);
+
+        //dot could be null, if the trace contain it twice
+        if(dot == null)
+            return;
+
+        //set dot to null
         setDot(null, position);
 
         //notify handlers
@@ -183,19 +203,23 @@ public abstract class AbstractLogic implements ILogic {
 
     /**
      * Creates a random LogicDot at the given position
-     * @param row
-     * @param column
+     * @param row row of the pitch
+     * @param column column of the pitch
      * @return
      */
-    protected static LogicDot createRandomLogicDot(int row, int column) {
-        DotColor color = DotColor.randomColor();
+    protected LogicDot createRandomLogicDot(int row, int column) {
+        DotColor color = DotColor.randomColor(numberDotColors);
         Position<Integer> position = new Position<>(row, column);
 
         return new LogicDot(color, position);
     }
 
+    /**
+     * Check if there is no move left, and shuffle the points in this situation,
+     * until there is a possible move.
+     */
     protected void checkAndShuffle() {
-        //TODO check if there is no move left, and shuffle the points in this situation, until there is a possible move
+        //TODO
     }
 
     public void registerDotsChangeHandler(DotsChangeHandler dotsChangeHandler) {
@@ -206,15 +230,43 @@ public abstract class AbstractLogic implements ILogic {
         dotsChangeHandlers.remove(dotsChangeHandler);
     }
 
+    public void registerGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler) {
+        gameStateChangeHandlers.add(gameStateChangeHandler);
+    }
+
+    public void unregisterGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler) {
+        gameStateChangeHandlers.remove(gameStateChangeHandler);
+    }
+
     public ScoreManager getScoreManager() {
         return scoreManager;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        GameState oldState = this.gameState;
+        this.gameState = gameState;
+
+        //notify listeners of changes
+        if(oldState != gameState) {
+            for(GameStateChangeHandler gameStateChangeHandler : gameStateChangeHandlers) {
+                gameStateChangeHandler.gameStateChanged(gameState);
+            }
+        }
+    }
+
+    public int getPitchSize() {
+        return pitchSize;
     }
 
     protected LogicDot getDot(int row, int column) {
         return pitch[row][column];
     }
 
-    protected LogicDot getDot(Position<Integer> position) {
+    public LogicDot getDot(Position<Integer> position) {
         return getDot(position.getY(), position.getX());
     }
 

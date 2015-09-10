@@ -3,28 +3,78 @@ package com.icelandic_courses.elie.myfirstapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 
 import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.animation.NoAnimationLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.GameState;
+import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
+import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
+import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
+import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
+import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class MyActivity extends Activity {
 
     public final static String EXTRA_MESSAGE = "com.icelandic_courses.elie.myfirstapp.MESSAGE";
+
+    private TrackingHandler trackingHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ILogic logic = new TimedLogic(8);
-        IAnimationLogic animationLogic = new NoAnimationLogic(logic);
+        //settings
+        int seconds = 5;
+        int pitchSize = 8;
+        int numberColors = 2;
+        int pixelSize = 660;
+        int padding = 10;
+
+        ILogic logic = new TimedLogic(
+                seconds,
+                pitchSize,
+                numberColors
+        );
+
+        PixelToPitchConverterDescription converterDescription = new PixelToPitchConverterDescription(
+                pitchSize,
+                pixelSize,
+                padding
+        );
+
+        PixelToPitchConverter converter = new PixelToPitchConverter(converterDescription);
+
+        IAnimationLogic animationLogic = new NoAnimationLogic(logic, converter);
+
+        //game state change handler
+        logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
+            @Override
+            public void gameStateChanged(GameState gameState) {
+                Log.i("Game state changed", gameState.toString());
+            }
+        });
+
+        //tracking handler
+        trackingHandler = new TrackingHandler(logic, converter);
+
+        //start game
         logic.start();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //forward touch events
+        return trackingHandler.onTouchEvent(event);
     }
 
     @Override
