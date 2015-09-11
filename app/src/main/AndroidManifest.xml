@@ -6,9 +6,10 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/MyTheme" >
+
         <activity
-            android:name=".MyActivity"
+            android:name=".view.MyActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,14 +17,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".DisplayMessageActivity"
+            android:name=".view.ClassicGameActivity"
             android:label="@string/title_activity_display_message"
-            android:parentActivityName=".MyActivity" >
+            android:parentActivityName=".view.MyActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MyActivity" />
+                android:value=".view.MyActivity" />
         </activity>
+
+        <activity
+            android:name=".view.MovesGameActivity"
+            android:label="@string/title_activity_display_message"
+            android:parentActivityName=".view.MyActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".view.MyActivity" />
+        </activity>
+
+
     </application>
 
 </manifest>

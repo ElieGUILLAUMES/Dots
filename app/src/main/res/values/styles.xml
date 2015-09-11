@@ -5,4 +5,30 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="MyTheme" parent="android:Theme.Holo.Light">
+        <item name="android:buttonStyle">@style/button</item>
+    </style>
+
+
+    <style name="button" parent="@android:style/Widget.Button">
+        <item name="android:gravity">center_vertical|center_horizontal</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:shadowColor">#FF000000</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">-1</item>
+        <item name="android:shadowRadius">0.2</item>
+        <item name="android:textSize">16dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <style name="classicButton" parent="button">
+        <item name="android:background">@drawable/button_classic</item>
+    </style>
+
+    <style name="movesButton" parent="button">
+        <item name="android:background">@drawable/button_moves</item>
+    </style>
+
 </resources>

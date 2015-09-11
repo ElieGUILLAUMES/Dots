@@ -3,15 +3,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
-    <EditText android:id="@+id/edit_message"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
-    <Button
+    android:orientation="vertical">
+
+    <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/button_send"
-        android:onClick="sendMessage"/>
+        android:layout_height="@dimen/size_title"
+        android:src="@drawable/title"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/buttonClassic"
+        android:layout_width="@dimen/size_menu_buttons"
+        android:layout_height="@dimen/size_menu_buttons"
+        style="@style/classicButton"
+        android:text="Classic"
+        android:onClick="launchClassicGame"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/buttonMoves"
+        android:layout_width="@dimen/size_menu_buttons"
+        android:layout_height="@dimen/size_menu_buttons"
+        style="@style/movesButton"
+        android:text="Moves"
+        android:onClick="launchMovesGame"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/space_between_menu_buttons"/>
+
+
 </LinearLayout>
