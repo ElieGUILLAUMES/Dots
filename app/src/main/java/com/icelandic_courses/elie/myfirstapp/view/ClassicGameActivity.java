@@ -16,6 +16,8 @@ import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.RemainingMovesHandler;
+import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
+import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
 
 public class ClassicGameActivity extends Activity {
@@ -29,11 +31,12 @@ public class ClassicGameActivity extends Activity {
     private SharedPreferences prefs;
 
     private int remainingMoves = 30;
+    private int score = 0;
 
     private LimitedMovesLogic logic;
+    private ScoreManager scoreManager;
 
     final Handler remainingMovesHandler = new Handler();
-
     private Vibrator vibe;
 
     @Override
@@ -84,6 +87,15 @@ public class ClassicGameActivity extends Activity {
             }
         });
 
+        scoreManager = logic.getScoreManager();
+        scoreManager.registerScoreChangeHandler(new ScoreChangeHandler() {
+            @Override
+            public void scoreChanged(int total, int additional) {
+                changeScoreView(total);
+                Log.i("Score changed", String.valueOf(total));
+            }
+        });
+
         //init the logic in game view, which sets up the animation logic and tracking handler
         gameView.initLogic(logic);
 
@@ -103,11 +115,14 @@ public class ClassicGameActivity extends Activity {
                         vibe.vibrate(100);
                     }
                 }
+                // update remaining moves
                 remainingMovesView.setText(getResources().getString(R.string.remainingMoves, logic.getRemainingMoves()));
                 remainingMoves = logic.getRemainingMoves();
+                // update score
+                scoreView.setText(getResources().getString(R.string.score, score));
             }
         };
-        remainingMovesHandler.postDelayed(remainingMovesRunnable, 0000);
+        remainingMovesHandler.postDelayed(remainingMovesRunnable, 0);
     }
 
     @Override
@@ -134,6 +149,10 @@ public class ClassicGameActivity extends Activity {
 
     private void changeRemainingMovesView(int remainingMoves){
         this.remainingMoves = remainingMoves;
+    }
+
+    private void changeScoreView(int score){
+        this.score = score;
     }
 
 }

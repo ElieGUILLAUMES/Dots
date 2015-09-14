@@ -46,4 +46,5 @@ public class ScoreManager {
     private static void addScore(int score) {
         totalScore += score;
     }
+
 }
