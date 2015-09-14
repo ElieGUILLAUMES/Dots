@@ -55,7 +55,7 @@ public class ClassicGameActivity extends Activity {
 
         remainingMovesView.setText(getResources().getString(R.string.remainingMoves, remainingMoves));
         scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, 0));
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("bestScore",0)));
 
         //settings
         //int moves = 30;
@@ -105,6 +105,14 @@ public class ClassicGameActivity extends Activity {
         //redraw
         gameView.invalidate();
 
+        // initialization of the best score
+        prefs = PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
+        if(!prefs.contains("bestScore_ClassicMode")){
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt("bestScore_ClassicMode", 0);
+            editor.commit();
+        }
+
         // check if the number of remainingMoves has changed every 30ms
         final Runnable remainingMovesRunnable = new Runnable() {
             public void run() {
@@ -120,6 +128,13 @@ public class ClassicGameActivity extends Activity {
                 remainingMoves = logic.getRemainingMoves();
                 // update score
                 scoreView.setText(getResources().getString(R.string.score, score));
+                if(remainingMoves == 0){
+                    if(prefs.getInt("bestScore_ClassicMode", 0) < scoreManager.getTotalScore()){
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putInt("bestScore_ClassicMode", scoreManager.getTotalScore());
+                        editor.commit();
+                    };
+                }
             }
         };
         remainingMovesHandler.postDelayed(remainingMovesRunnable, 0);

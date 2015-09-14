@@ -42,7 +42,6 @@ public class LimitedMovesLogic extends AbstractLogic {
 
         //move was successful: decrease moves and check if the game is finished
         if(--remainingMoves <= 0) {
-            setRemainingMovesLeft(remainingMoves);
             finish();
         }
         Log.i("Remaining moves", remainingMoves + "");

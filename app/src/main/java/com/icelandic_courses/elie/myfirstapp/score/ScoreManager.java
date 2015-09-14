@@ -47,4 +47,8 @@ public class ScoreManager {
         totalScore += score;
     }
 
+    public int getTotalScore(){
+        return totalScore;
+    }
+
 }
