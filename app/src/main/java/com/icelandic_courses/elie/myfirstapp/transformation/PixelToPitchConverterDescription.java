@@ -43,4 +43,11 @@ public class PixelToPitchConverterDescription {
     public float getPadding() {
         return padding;
     }
+
+    public void setPixelSize(float pixelSize) {
+        this.pixelSize = pixelSize;
+
+        //calculate other attributes
+        setSegmentSize();
+    }
 }

@@ -20,22 +20,34 @@ public class NoAnimationLogic extends AbstractAnimationLogic {
 
         @Override
         public void dotMoved(LogicDot logicDot, Position<Integer> prevPosition) {
-            //do nothing
+            //get corresponding animation dot
+            AnimationDot animationDot = getAnimationDot(logicDot.getId());
+
+            //update desired position
+            updateDesiredPosition(logicDot);
+
+            //update current position
+            updateCurrentPosition(animationDot);
         }
 
         @Override
         public void dotCreated(LogicDot logicDot) {
             //create animation dot
-            AnimationDot dot = createAnimationDotFromLogicDot(logicDot);
+            AnimationDot animationDot = createAnimationDotFromLogicDot(logicDot);
 
+            //update current position
+            updateCurrentPosition(animationDot);
+
+            //add the dot to the model
+            addDot(animationDot);
+        }
+
+        private void updateCurrentPosition(AnimationDot dot) {
             //set the current position to the desired position --> no animation
             Position<Float> desiredPosition = dot.getDesiredPosition();
             Position<Float> currentPosition = dot.getCurrentPosition();
             currentPosition.setX(desiredPosition.getX());
             currentPosition.setY(desiredPosition.getY());
-
-            //add the dot to the model
-            addDot(dot);
         }
     };
 
@@ -43,5 +55,10 @@ public class NoAnimationLogic extends AbstractAnimationLogic {
         super(logic, converter);
 
         logic.registerDotsChangeHandler(dotsChangeHandler);
+    }
+
+    @Override
+    public DotsChangeHandler getDotsChangeHandler() {
+        return dotsChangeHandler;
     }
 }

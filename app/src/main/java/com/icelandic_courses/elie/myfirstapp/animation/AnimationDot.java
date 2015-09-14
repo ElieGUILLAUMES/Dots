@@ -1,6 +1,7 @@
 package com.icelandic_courses.elie.myfirstapp.animation;
 
 import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
+import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 /**
@@ -8,15 +9,13 @@ import com.icelandic_courses.elie.myfirstapp.util.Position;
  */
 public class AnimationDot {
 
-    private final int id;
-    private final DotColor color;
+    private final LogicDot logicDot;
 
     private Position<Float> currentPosition = new Position<Float>(0.f, 0.f);
     private Position<Float> desiredPosition = new Position<Float>(0.f, 0.f);
 
-    public AnimationDot(DotColor color, int id) {
-        this.color = color;
-        this.id = id;
+    public AnimationDot(LogicDot logicDot) {
+        this.logicDot = logicDot;
     }
 
     public Position<Float> getCurrentPosition() {
@@ -28,11 +27,14 @@ public class AnimationDot {
     }
 
     public int getId() {
-        return id;
+        return logicDot.getId();
     }
 
     public DotColor getColor() {
-        return color;
+        return logicDot.getColor();
     }
 
+    LogicDot getLogicDot() {
+        return logicDot;
+    }
 }

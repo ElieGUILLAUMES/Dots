@@ -1,9 +1,11 @@
 package com.icelandic_courses.elie.myfirstapp.trace;
 
+import android.os.Trace;
 import android.util.Log;
 import android.view.MotionEvent;
 
 import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
+import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.util.Orientation;
@@ -25,6 +27,7 @@ public class TrackingHandler {
 
     private final ILogic logic;
     private final PixelToPitchConverter converter;
+    private final Collection<TraceChangeHandler> traceChangeHandlers;
 
     private DotColor traceColor = null;
     private List<Position<Integer>> trace;
@@ -36,6 +39,7 @@ public class TrackingHandler {
         this.converter = converter;
         trace = new ArrayList<>();
         segments = new HashSet<>();
+        traceChangeHandlers = new ArrayList<>();
     }
 
     public synchronized boolean onTouchEvent(MotionEvent event) {
@@ -71,11 +75,12 @@ public class TrackingHandler {
     }
 
     protected void track(Position<Float> trackingPoint) {
-        Log.i("track", trackingPoint.toString());
+        //Log.i("track", trackingPoint.toString());
         //initialize the start of the segment
         Position<Integer> segmentPitchStart;
         Position<Float> segmentStart;
         if(trace.isEmpty()) {
+            Log.i("track", "really looking for the first pos");
             segmentPitchStart = converter.transformPixelToPitch(startTrackingPoint);
             segmentStart = startTrackingPoint;
         }
@@ -102,7 +107,7 @@ public class TrackingHandler {
             Collection<Position<Integer>> potentialPoints,
             Position<Float> segmentStart,
             Position<Float> segmentEnd) {
-        Log.i("captureNextTracePoints", referencePoint.toString());
+        //Log.i("captureNextTracePoints", referencePoint.toString());
         //min distance
         double minDistance = MIN_DISTANCE_FACTOR * converter.getDescription().getSegmentSize();
 
@@ -156,6 +161,11 @@ public class TrackingHandler {
 
         //add to trace
         trace.add(point);
+
+        Log.i("trace", trace.toString());
+
+        //notify listeners
+        notifyTraceChangeHandlers();
     }
 
     private List<Position<Integer>> getPotentialNeighbors(final Position<Integer> referencePoint) {
@@ -191,11 +201,32 @@ public class TrackingHandler {
         //clear the trace
         trace.clear();
 
+        //clear trace color
+        traceColor = null;
+
+        //clear segments
+        segments.clear();
+
         //clear prev tracking point
         startTrackingPoint = null;
     }
 
     public List<Position<Integer>> getTrace() {
         return trace;
+    }
+
+
+    public void notifyTraceChangeHandlers() {
+        for(TraceChangeHandler traceChangeHandler : traceChangeHandlers) {
+            traceChangeHandler.onTraceChange(trace);
+        }
+    }
+
+    public void registerTraceChangeHandler(TraceChangeHandler traceChangeHandler) {
+        traceChangeHandlers.add(traceChangeHandler);
+    }
+
+    public void unregisterTraceChangeHandler(TraceChangeHandler traceChangeHandler) {
+        traceChangeHandlers.remove(traceChangeHandler);
     }
 }

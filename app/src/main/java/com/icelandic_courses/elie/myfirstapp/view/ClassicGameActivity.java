@@ -22,16 +22,18 @@ import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
+import com.icelandic_courses.elie.myfirstapp.util.Position;
+
+import java.util.List;
 
 public class ClassicGameActivity extends Activity {
 
     private GameView gameView;
     private TrackingHandler trackingHandler;
-
-    private static final int pitchSize = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,40 +41,18 @@ public class ClassicGameActivity extends Activity {
 
         setContentView(R.layout.activity_classic_game);
         gameView = (GameView) findViewById(R.id.gameView);
-        RelativeLayout relativeLayout = (RelativeLayout) gameView.getParent();
-
-
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
 
         //settings
-        int moves = 5;
+        int moves = 30;
         int numberColors = 3;
-        int padding = 10;
+        int pitchSize = 6;
 
-        int pixelSize;
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
-            pixelSize = (int) ( Math.min(size.x, size.y) - relativeLayout.getPaddingLeft() - relativeLayout.getPaddingRight() );
-        } else {
-            pixelSize = (int) ( Math.min(size.x, size.y) - relativeLayout.getPaddingBottom() - relativeLayout.getPaddingTop() );
-        }
-
+        //init logic with basic settings
         ILogic logic = new LimitedMovesLogic(
                 moves,
                 pitchSize,
                 numberColors
         );
-
-        PixelToPitchConverterDescription converterDescription = new PixelToPitchConverterDescription(
-                pitchSize,
-                pixelSize,
-                padding
-        );
-
-        PixelToPitchConverter converter = new PixelToPitchConverter(converterDescription);
-
-        IAnimationLogic animationLogic = new NoAnimationLogic(logic, converter);
 
         //game state change handler
         logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
@@ -82,13 +62,13 @@ public class ClassicGameActivity extends Activity {
             }
         });
 
-        //tracking handler
-        trackingHandler = new TrackingHandler(logic, converter);
-        gameView.setTrackingHandler(trackingHandler);
+        //init the logic in game view, which sets up the animation logic and tracking handler
+        gameView.initLogic(logic);
 
         //start game
         logic.start();
 
+        //redraw
         gameView.invalidate();
     }
 
@@ -112,9 +92,5 @@ public class ClassicGameActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public static int getPitchSize(){
-        return pitchSize;
     }
 }

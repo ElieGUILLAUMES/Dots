@@ -1,7 +1,5 @@
 package com.icelandic_courses.elie.myfirstapp.animation;
 
-import android.util.Log;
-
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
@@ -21,7 +19,7 @@ public abstract class AbstractAnimationLogic implements IAnimationLogic {
     protected ILogic logic;
     protected PixelToPitchConverter converter;
 
-    private static Collection<AnimationDot> dotsList = new ArrayList<AnimationDot>();
+    private Collection<AnimationDot> dotsList = new ArrayList<AnimationDot>();
     private Map<Integer, AnimationDot> dotsMap = new HashMap<Integer, AnimationDot>();
 
     public AbstractAnimationLogic(ILogic logic, PixelToPitchConverter converter) {
@@ -37,16 +35,35 @@ public abstract class AbstractAnimationLogic implements IAnimationLogic {
      * @return animation dot with id, color and desired position
      */
     protected AnimationDot createAnimationDotFromLogicDot(LogicDot logicDot) {
-        AnimationDot animationDot = new AnimationDot(logicDot.getColor(), logicDot.getId());
+        AnimationDot animationDot = new AnimationDot(logicDot);
+
+        updateDesiredPosition(animationDot);
+
+        return animationDot;
+    }
+
+    /**
+     * Updates the desired position of the corresponding animation dot
+     * @param logicDot
+     */
+    protected void updateDesiredPosition(LogicDot logicDot) {
+        AnimationDot animationDot = getAnimationDot(logicDot.getId());
+        updateDesiredPosition(animationDot);
+    }
+
+    /**
+     * Updates the desired position of the animation dot
+     * @param animationDot
+     */
+    private void updateDesiredPosition(AnimationDot animationDot) {
 
         //transform pitch to pixels
-        Position<Float> pixelPosition = converter.transformPitchToPixel(logicDot.getPosition());
+        Position<Integer> logicDotPosition = animationDot.getLogicDot().getPosition();
+        Position<Float> pixelPosition = converter.transformPitchToPixel(logicDotPosition);
 
         //set the position as the desired position
         animationDot.getDesiredPosition().setY(pixelPosition.getY());
         animationDot.getDesiredPosition().setX(pixelPosition.getX());
-
-        return animationDot;
     }
 
     protected void addDot(AnimationDot dot) {
@@ -63,11 +80,34 @@ public abstract class AbstractAnimationLogic implements IAnimationLogic {
         dotsMap.remove(dot.getId());
     }
 
-    protected AnimationDot getDot(int id) {
+    protected AnimationDot getAnimationDot(int id) {
         return dotsMap.get(id);
     }
 
-    public static Collection<AnimationDot> getDots() {
+    public Collection<AnimationDot> getDots() {
         return dotsList;
     }
+
+    /**
+     * Call this method, if pixel sizes changed!
+     */
+    public void invalidate() {
+
+        //cache logic dots
+        Collection<LogicDot> logicDots = new ArrayList<>();
+        for(AnimationDot animationDot : dotsList) {
+            logicDots.add(animationDot.getLogicDot());
+        }
+
+        //clear everything
+        dotsList.clear();
+        dotsMap.clear();
+
+        //create every animation dot again
+        for(LogicDot logicDot : logicDots) {
+            getDotsChangeHandler().dotCreated(logicDot);
+        }
+    }
+
+    protected abstract DotsChangeHandler getDotsChangeHandler();
 }

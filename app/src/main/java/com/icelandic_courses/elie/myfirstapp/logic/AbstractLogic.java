@@ -1,5 +1,7 @@
 package com.icelandic_courses.elie.myfirstapp.logic;
 
+import android.util.Log;
+
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChecker;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
@@ -60,6 +62,8 @@ public abstract class AbstractLogic implements ILogic {
         shiftDown(affectedColumns);
         createDots(affectedColumns);
         scoreManager.addTrace(trace);
+
+        Log.i("Pitch", toString());
     }
 
     @Override
