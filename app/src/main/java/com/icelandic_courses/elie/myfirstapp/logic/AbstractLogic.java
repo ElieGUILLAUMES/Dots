@@ -19,6 +19,7 @@ public abstract class AbstractLogic implements ILogic {
     private final Collection<DotsChangeHandler> dotsChangeHandlers;
     private final Collection<GameStateChangeHandler> gameStateChangeHandlers;
 
+
     private final ScoreManager scoreManager;
     private GameState gameState = GameState.NOT_STARTED;
     private final int pitchSize;
@@ -37,6 +38,7 @@ public abstract class AbstractLogic implements ILogic {
         scoreManager = new ScoreManager();
         dotsChangeHandlers = new ArrayList<DotsChangeHandler>();
         gameStateChangeHandlers = new ArrayList<GameStateChangeHandler>();
+
     }
 
     @Override
@@ -55,7 +57,6 @@ public abstract class AbstractLogic implements ILogic {
         if (gameState != GameState.RUNNING) {
             return; //do nothing, if the game is not running
         }
-
 
         TraceChecker.check(trace, this);
         int[] affectedColumns = removeDots(trace);
@@ -241,6 +242,7 @@ public abstract class AbstractLogic implements ILogic {
     public void unregisterGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler) {
         gameStateChangeHandlers.remove(gameStateChangeHandler);
     }
+
 
     public ScoreManager getScoreManager() {
         return scoreManager;

@@ -2,12 +2,15 @@ package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
@@ -26,7 +29,6 @@ public class MyActivity extends Activity {
 
 
     public final static String EXTRA_MESSAGE = "com.icelandic_courses.elie.myfirstapp.MESSAGE";
-
 
 
     @Override
@@ -67,6 +69,14 @@ public class MyActivity extends Activity {
     public void launchMovesGame(View view){
         Intent intent = new Intent(this, MovesGameActivity.class);
         startActivity(intent);
+    }
 
+    public void highscore(View view){
+
+    }
+
+    public void settings(View view){
+        Intent intent = new Intent(this, PreferenceActivity.class);
+        startActivity(intent);
     }
 }

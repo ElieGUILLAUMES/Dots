@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="MyTheme" parent="android:Theme.Holo.Light">
+    <style name="MyTheme" parent="android:Theme.Holo.Light.NoActionBar">
         <item name="android:buttonStyle">@style/button</item>
     </style>
 
@@ -29,6 +29,14 @@
 
     <style name="movesButton" parent="button">
         <item name="android:background">@drawable/button_moves</item>
+    </style>
+
+    <style name="highScoreButton" parent="button">
+        <item name="android:background">@drawable/button_highscore</item>
+    </style>
+
+    <style name="settingsButton" parent="button">
+        <item name="android:background">@drawable/button_settings</item>
     </style>
 
 </resources>

@@ -2,8 +2,6 @@ package com.icelandic_courses.elie.myfirstapp.logic;
 
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
-import java.util.List;
-
 /**
  * Created by Endos on 03.09.2015.
  */

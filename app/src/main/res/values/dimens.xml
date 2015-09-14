@@ -3,7 +3,13 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- Menu -->
     <dimen name="size_title">150dp</dimen>
-    <dimen name="space_between_menu_buttons">32dp</dimen>
+    <dimen name="vertical_space_between_menu_buttons">32dp</dimen>
+    <dimen name="horizontal_space_between_menu_buttons">32dp</dimen>
     <dimen name="size_menu_buttons">100dp</dimen>
+
+    <!-- Game -->
+    <dimen name="game_text_size">16sp</dimen>
+
 </resources>

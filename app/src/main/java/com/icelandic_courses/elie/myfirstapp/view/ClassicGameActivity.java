@@ -1,55 +1,67 @@
 package com.icelandic_courses.elie.myfirstapp.view;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.content.res.Configuration;
-import android.graphics.Point;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.Toolbar;
+import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
-import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
-import com.icelandic_courses.elie.myfirstapp.animation.NoAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
-import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
-import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
+import com.icelandic_courses.elie.myfirstapp.logic.RemainingMovesHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
-import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
-import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
-import com.icelandic_courses.elie.myfirstapp.util.Position;
-
-import java.util.List;
 
 public class ClassicGameActivity extends Activity {
 
     private GameView gameView;
+    private TextView remainingMovesView;
+    private TextView scoreView;
+    private TextView bestScoreView;
+
     private TrackingHandler trackingHandler;
+    private SharedPreferences prefs;
+
+    private int remainingMoves = 30;
+
+    private LimitedMovesLogic logic;
+
+    final Handler remainingMovesHandler = new Handler();
+
+    private Vibrator vibe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
+        int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
+
         setContentView(R.layout.activity_classic_game);
         gameView = (GameView) findViewById(R.id.gameView);
+        remainingMovesView = (TextView) findViewById(R.id.remainingMoves);
+        scoreView = (TextView) findViewById(R.id.score);
+        bestScoreView = (TextView) findViewById(R.id.bestScore);
+
+        remainingMovesView.setText(getResources().getString(R.string.remainingMoves, remainingMoves));
+        scoreView.setText(getResources().getString(R.string.score, 0));
+        bestScoreView.setText(getResources().getString(R.string.best_score, 0));
 
         //settings
-        int moves = 30;
-        int numberColors = 3;
-        int pitchSize = 6;
+        //int moves = 30;
+        //int numberColors = 3;
+        //int pitchSize = 6;
 
         //init logic with basic settings
-        ILogic logic = new LimitedMovesLogic(
-                moves,
+        logic = new LimitedMovesLogic(
+                remainingMoves,
                 pitchSize,
                 numberColors
         );
@@ -62,6 +74,16 @@ public class ClassicGameActivity extends Activity {
             }
         });
 
+        vibe = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
+
+        logic.registerRemainingMoveHandler(new RemainingMovesHandler() {
+            @Override
+            public void remainingMovesChanged(int remainingMoves) {
+                changeRemainingMovesView(remainingMoves);
+                Log.i("RemainingMoves changed", getString(remainingMoves));
+            }
+        });
+
         //init the logic in game view, which sets up the animation logic and tracking handler
         gameView.initLogic(logic);
 
@@ -70,6 +92,22 @@ public class ClassicGameActivity extends Activity {
 
         //redraw
         gameView.invalidate();
+
+        // check if the number of remainingMoves has changed every 30ms
+        final Runnable remainingMovesRunnable = new Runnable() {
+            public void run() {
+                remainingMovesHandler.postDelayed(this, 30);
+                // if a move is done ==> check if vibrate
+                if(remainingMoves != logic.getRemainingMoves()){
+                    if(prefs.getBoolean("vibration", false)){
+                        vibe.vibrate(100);
+                    }
+                }
+                remainingMovesView.setText(getResources().getString(R.string.remainingMoves, logic.getRemainingMoves()));
+                remainingMoves = logic.getRemainingMoves();
+            }
+        };
+        remainingMovesHandler.postDelayed(remainingMovesRunnable, 0000);
     }
 
     @Override
@@ -93,4 +131,9 @@ public class ClassicGameActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void changeRemainingMovesView(int remainingMoves){
+        this.remainingMoves = remainingMoves;
+    }
+
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference android:title="Username"
+        android:key="username"
+        android:summary="Username used for the high scores">
+    </EditTextPreference>
+
+    <CheckBoxPreference android:title="Vibration"
+        android:defaultValue="false"
+        android:summary="If this option is selected, the phone vibrate after each move done"
+        android:key="vibration" />
+
+    <ListPreference android:title="Color number"
+        android:defaultValue="3"
+        android:summary="Number of dots' color. The higher it is, the more difficult is the game"
+        android:key="numberColor"
+        android:entries="@array/listColorNumberDescriptionArray"
+        android:entryValues="@array/listColorNumberArray"/>
+
+    <ListPreference android:title="Pitch's Size"
+        android:defaultValue="6"
+        android:summary="Number of rows and columns of the pitch"
+        android:key="pitchSize"
+        android:entries="@array/listSizeDescriptionArray"
+        android:entryValues="@array/listSizeNumberArray"/>
+
+</PreferenceScreen>

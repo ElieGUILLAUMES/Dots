@@ -3,32 +3,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:gravity="center">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/size_title"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
         android:src="@drawable/title"
-        android:layout_marginBottom="32dp"/>
+        android:layout_marginBottom="32dp"
+        android:layout_gravity="center" />
 
-    <Button
-        android:id="@+id/buttonClassic"
-        android:layout_width="@dimen/size_menu_buttons"
-        android:layout_height="@dimen/size_menu_buttons"
-        style="@style/classicButton"
-        android:text="Classic"
-        android:onClick="launchClassicGame"
-        android:layout_gravity="center_horizontal" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
 
-    <Button
-        android:id="@+id/buttonMoves"
-        android:layout_width="@dimen/size_menu_buttons"
-        android:layout_height="@dimen/size_menu_buttons"
-        style="@style/movesButton"
-        android:text="Moves"
-        android:onClick="launchMovesGame"
+            <Button
+                android:id="@+id/buttonClassic"
+                android:layout_width="@dimen/size_menu_buttons"
+                android:layout_height="@dimen/size_menu_buttons"
+                style="@style/classicButton"
+                android:text="Classic"
+                android:onClick="launchClassicGame" />
+
+            <Button
+                android:id="@+id/buttonMoves"
+                android:layout_width="@dimen/size_menu_buttons"
+                android:layout_height="@dimen/size_menu_buttons"
+                style="@style/movesButton"
+                android:text="Moves"
+                android:onClick="launchMovesGame"
+                android:layout_marginLeft="@dimen/horizontal_space_between_menu_buttons"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/space_between_menu_buttons"/>
+        android:layout_marginTop="@dimen/vertical_space_between_menu_buttons">
 
+        <Button
+            android:id="@+id/buttonHighScore"
+            android:layout_width="@dimen/size_menu_buttons"
+            android:layout_height="@dimen/size_menu_buttons"
+            style="@style/highScoreButton"
+            android:text="@string/highScore"
+            android:onClick="highScore" />
+
+        <Button
+            android:id="@+id/buttonSettings"
+            android:layout_width="@dimen/size_menu_buttons"
+            android:layout_height="@dimen/size_menu_buttons"
+            style="@style/settingsButton"
+            android:text="@string/settings"
+            android:onClick="settings"
+            android:layout_marginLeft="@dimen/horizontal_space_between_menu_buttons"/>
+
+    </LinearLayout>
 
 </LinearLayout>
