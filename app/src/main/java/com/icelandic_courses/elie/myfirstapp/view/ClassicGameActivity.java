@@ -55,7 +55,7 @@ public class ClassicGameActivity extends Activity {
 
         remainingMovesView.setText(getResources().getString(R.string.remainingMoves, remainingMoves));
         scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("bestScore",0)));
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("bestScoreClassicMode",0)));
 
         //settings
         //int moves = 30;
@@ -106,10 +106,10 @@ public class ClassicGameActivity extends Activity {
         gameView.invalidate();
 
         // initialization of the best score
-        prefs = PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
-        if(!prefs.contains("bestScore_ClassicMode")){
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!prefs.contains("bestScoreClassicMode")){
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("bestScore_ClassicMode", 0);
+            editor.putInt("bestScoreClassicMode", 0);
             editor.commit();
         }
 
@@ -129,9 +129,9 @@ public class ClassicGameActivity extends Activity {
                 // update score
                 scoreView.setText(getResources().getString(R.string.score, score));
                 if(remainingMoves == 0){
-                    if(prefs.getInt("bestScore_ClassicMode", 0) < scoreManager.getTotalScore()){
+                    if(prefs.getInt("bestScoreClassicMode", 0) < score){
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("bestScore_ClassicMode", scoreManager.getTotalScore());
+                        editor.putInt("bestScoreClassicMode", scoreManager.getTotalScore());
                         editor.commit();
                     };
                 }
