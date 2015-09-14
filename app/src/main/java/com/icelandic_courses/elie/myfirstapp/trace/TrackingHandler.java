@@ -107,7 +107,7 @@ public class TrackingHandler {
             Collection<Position<Integer>> potentialPoints,
             Position<Float> segmentStart,
             Position<Float> segmentEnd) {
-        //Log.i("captureNextTracePoints", referencePoint.toString());
+
         //min distance
         double minDistance = MIN_DISTANCE_FACTOR * converter.getDescription().getSegmentSize();
 
@@ -209,6 +209,9 @@ public class TrackingHandler {
 
         //clear prev tracking point
         startTrackingPoint = null;
+
+        //notify handler
+        notifyTraceChangeHandlers();
     }
 
     public List<Position<Integer>> getTrace() {
@@ -218,7 +221,7 @@ public class TrackingHandler {
 
     public void notifyTraceChangeHandlers() {
         for(TraceChangeHandler traceChangeHandler : traceChangeHandlers) {
-            traceChangeHandler.onTraceChange(trace);
+            traceChangeHandler.onTraceChange(trace, traceColor);
         }
     }
 

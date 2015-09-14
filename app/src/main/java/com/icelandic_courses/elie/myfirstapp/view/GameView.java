@@ -2,11 +2,11 @@ package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,16 +14,14 @@ import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.animation.AnimationDot;
 
 import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
-import com.icelandic_courses.elie.myfirstapp.animation.NoAnimationLogic;
+import com.icelandic_courses.elie.myfirstapp.animation.LinearAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
-import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,7 +33,7 @@ public class GameView extends View {
 
     private final static String TAG = GameView.class.getSimpleName();
 
-    private Timer timer;
+    private final Timer timer;
 
     private ILogic logic;
     private IAnimationLogic animationLogic;
@@ -44,6 +42,7 @@ public class GameView extends View {
 
     private RectF m_circle = new RectF();
     private Paint m_paintCircle = new Paint();
+    private Paint m_paintLine = new Paint();
 
     private int m_cellWidth;
     private int m_cellHeight;
@@ -57,6 +56,10 @@ public class GameView extends View {
         m_paintCircle.setStyle(Paint.Style.FILL_AND_STROKE);
         m_paintCircle.setAntiAlias(true);
 
+        m_paintLine.setStyle(Paint.Style.STROKE);
+        m_paintLine.setStrokeJoin(Paint.Join.ROUND);
+        m_paintLine.setAntiAlias(true);
+
         //auto invalidate every 30 milliseconds
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -64,7 +67,32 @@ public class GameView extends View {
             public void run() {
                 postInvalidate();
             }
-        }, 0, 30);
+        }, 0, IAnimationLogic.PERIOD);
+    }
+
+    public void initLogic(ILogic logic) {
+        this.logic = logic;
+
+        //settings
+        int padding = 10;
+        int pixelSize = Math.min(getWidth(), getHeight());
+
+        // pixel <--> pitch converter
+        converterDescription = new PixelToPitchConverterDescription(
+                logic.getPitchSize(),
+                pixelSize,
+                padding
+        );
+        PixelToPitchConverter converter = new PixelToPitchConverter(converterDescription);
+
+        //tracking handler
+        trackingHandler = new TrackingHandler(logic, converter);
+
+        //animation logic
+        animationLogic = new LinearAnimationLogic(logic, converter, trackingHandler);
+
+        //set cell size, because the pitch size wasn't clear before
+        setCellSize();
     }
 
     @Override
@@ -106,7 +134,48 @@ public class GameView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        drawTrace(canvas);
         drawDots(canvas);
+    }
+
+    private void drawTrace(Canvas canvas) {
+
+        //set stroke width
+        float strokeWidth = converterDescription.getSegmentSize() * 0.15f;
+        m_paintLine.setStrokeWidth(strokeWidth);
+
+        //trace color
+        int traceColor = getColor(animationLogic.getAnimatedTraceColor());
+        int traceAlpha = 127;
+        int traceColorAlpha = Color.argb(traceAlpha, Color.red(traceColor), Color.green(traceColor), Color.blue(traceColor));
+
+        //draw trace
+        Position<Float> previousPosition = null;
+        for(Position<Float> position : animationLogic.getAnimatedTracePositions()) {
+
+            //set color
+            m_paintCircle.setColor(traceColorAlpha);
+            m_paintLine.setColor(traceColorAlpha);
+
+            //draw dots
+            drawCircle(canvas, position, 0.9f);
+
+            //draw lines
+            if(previousPosition != null) {
+                drawLine(canvas, previousPosition, position);
+            }
+            previousPosition = position;
+        }
+    }
+
+    private void drawLine(Canvas canvas, Position<Float> previousPosition, Position<Float> position) {
+        canvas.drawLine(
+                previousPosition.getX(),
+                previousPosition.getY(),
+                position.getX(),
+                position.getY(),
+                m_paintLine
+        );
     }
 
     private void drawDots(Canvas canvas){
@@ -116,65 +185,45 @@ public class GameView extends View {
             return;
         }
 
-        for(AnimationDot animationDot : animationLogic.getDots()) {
-
-            //calculate ovals boundaries
-            float x = animationDot.getCurrentPosition().getX();
-            float y = animationDot.getCurrentPosition().getY();
-            m_circle.set(x - m_cellWidth / 2f, y - m_cellHeight / 2f, x + m_cellWidth / 2f, y + m_cellHeight / 2f);
-            m_circle.inset(m_cellWidth * 0.2f, m_cellHeight * 0.2f);
-
-            //draw colored oval
-            setPaintColor(animationDot.getColor());
-            canvas.drawOval(m_circle, m_paintCircle);
+        //draw dots
+        for(AnimationDot animationDot : animationLogic.getAnimationDots()) {
+            setPaintColor(m_paintCircle, animationDot.getColor());
+            drawCircle(canvas, animationDot.getCurrentPosition(), 0.8f);
         }
     }
 
-    private void setPaintColor(DotColor dotColor){
+    private void drawCircle(Canvas canvas, Position<Float> position, float percentageWidth) {
+        //calculate ovals boundaries
+        float x = position.getX();
+        float y = position.getY();
+        m_circle.set(x - m_cellWidth / 2f, y - m_cellHeight / 2f, x + m_cellWidth / 2f, y + m_cellHeight / 2f);
+        m_circle.inset(m_cellWidth * (1-percentageWidth), m_cellHeight * (1-percentageWidth));
+
+        canvas.drawOval(m_circle, m_paintCircle);
+    }
+
+    private void setPaintColor(Paint paint, DotColor dotColor){
+        paint.setColor(getColor(dotColor));
+    }
+
+    private int getColor(DotColor dotColor) {
+
+        if(dotColor == null)
+            dotColor = DotColor.YELLOW;
+
         switch (dotColor){
             case BLUE:
-                m_paintCircle.setColor(getResources().getColor(R.color.blue));
-                break;
+                return getResources().getColor(R.color.blue);
             case RED:
-                m_paintCircle.setColor(getResources().getColor(R.color.red));
-                break;
+                return getResources().getColor(R.color.red);
             case GREEN:
-                m_paintCircle.setColor(getResources().getColor(R.color.green));
-                break;
+                return getResources().getColor(R.color.green);
+            case VIOLET:
+                return getResources().getColor(R.color.violet);
+            case YELLOW:
+            default:
+                return getResources().getColor(R.color.yellow);
         }
-    }
-
-    public void initLogic(ILogic logic) {
-        this.logic = logic;
-
-        //settings
-        int padding = 10;
-        int pixelSize = Math.min(getWidth(), getHeight());
-
-        // pixel <--> pitch converter
-        converterDescription = new PixelToPitchConverterDescription(
-                logic.getPitchSize(),
-                pixelSize,
-                padding
-        );
-        PixelToPitchConverter converter = new PixelToPitchConverter(converterDescription);
-
-        //animation logic
-        animationLogic = new NoAnimationLogic(logic, converter);
-
-        //tracking handler
-        trackingHandler = new TrackingHandler(logic, converter);
-
-        //add trace changed handler
-        trackingHandler.registerTraceChangeHandler(new TraceChangeHandler() {
-            @Override
-            public void onTraceChange(List<Position<Integer>> trace) {
-                //TODO
-            }
-        });
-
-        //set cell size, because the pitch size wasn't clear before
-        setCellSize();
     }
 
     @Override

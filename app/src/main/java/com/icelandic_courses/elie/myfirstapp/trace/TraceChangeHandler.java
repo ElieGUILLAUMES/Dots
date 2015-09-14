@@ -1,5 +1,6 @@
 package com.icelandic_courses.elie.myfirstapp.trace;
 
+import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 import java.util.List;
@@ -9,5 +10,6 @@ import java.util.List;
  */
 public interface TraceChangeHandler {
 
-    public void onTraceChange(List<Position<Integer>> trace);
+    public void onTraceChange(List<Position<Integer>> trace, DotColor color);
+
 }
