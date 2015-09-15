@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference android:title="Username"
-        android:key="username"
-        android:summary="Username used for the high scores">
-    </EditTextPreference>
+    <CheckBoxPreference android:title="Silence Mode"
+        android:defaultValue="false"
+        android:summary="If this option is selected, all the game's sounds are disabled"
+        android:key="silence" />
 
     <CheckBoxPreference android:title="Vibration"
         android:defaultValue="false"

@@ -21,7 +21,7 @@
         <activity
             android:name=".view.ClassicGameActivity"
             android:label="@string/title_activity_display_message"
-            android:parentActivityName=".view.MyActivity">
+            android:parentActivityName=".view.MyActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".view.MyActivity" />
@@ -41,6 +41,10 @@
         <activity
             android:name=".view.GameFinishedActivity"
             android:label="@string/title_activity_game_finished" >
+        </activity>
+        <activity
+            android:name=".view.HighScoresActivity"
+            android:label="@string/title_activity_high_scores" >
         </activity>
     </application>
 

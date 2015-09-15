@@ -3,6 +3,7 @@ package com.icelandic_courses.elie.myfirstapp.logic.moves;
 import android.util.Log;
 
 import com.icelandic_courses.elie.myfirstapp.logic.AbstractLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.Trace;
@@ -67,7 +68,7 @@ public class LimitedMovesLogic extends AbstractLogic {
 
     @Override
     public String getMode() {
-        return "moves";
+        return GameMode.MOVES.toString();
     }
 
 }

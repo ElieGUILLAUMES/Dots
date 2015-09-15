@@ -4,6 +4,7 @@ import android.os.CountDownTimer;
 import android.util.Log;
 
 import com.icelandic_courses.elie.myfirstapp.logic.AbstractLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +71,6 @@ public class TimedLogic extends AbstractLogic {
 
     @Override
     public String getMode() {
-        return "classic";
+        return GameMode.CLASSIC.toString();
     }
 }
