@@ -1,7 +1,9 @@
 package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -41,8 +43,7 @@ public class HighScoresActivity extends Activity {
         highScoreListView = (ListView) findViewById(R.id.highScores);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        highScores.add(new HighScore(GameMode.CLASSIC.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString(), 0)));
+        createHighScoreList();
 
         highScoreAdapter = new HighScoreAdapter(this, highScores);
         highScoreListView.setAdapter(highScoreAdapter);
@@ -101,5 +102,38 @@ public class HighScoresActivity extends Activity {
     public void onBackPressed() {
         this.finish();
         super.onBackPressed();
+    }
+
+    private void resetHighScores(){
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("highscore" + GameMode.CLASSIC.toString(), 0);
+        editor.putInt("highscore" + GameMode.MOVES.toString(), 0);
+        editor.commit();
+        createHighScoreList();
+        highScoreAdapter.notifyDataSetChanged();
+    }
+
+    private void createHighScoreList(){
+        highScores.clear();
+        highScores.add(new HighScore(GameMode.CLASSIC.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString(), 0)));
+        highScores.add(new HighScore(GameMode.MOVES.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString(), 0)));
+    }
+
+    public void alertBeforeDeleteHighScores(View view){
+        new AlertDialog.Builder(this)
+                .setTitle("HighScores Suppression")
+                .setMessage("Are you sure you want to delete all your highscores?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        resetHighScores();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // do nothing
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

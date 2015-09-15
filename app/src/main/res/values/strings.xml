@@ -30,4 +30,7 @@
     <string name="menu">Menu</string>
     <string name="title_activity_high_scores">HighScoresActivity</string>
 
+    <!-- High Scores -->
+    <string name="highScoreReset">Reset</string>
+
 </resources>
