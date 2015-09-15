@@ -1,9 +1,5 @@
 package com.icelandic_courses.elie.myfirstapp.animation;
 
-/**
- * Created by Endos on 14.09.2015.
- */
-
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
@@ -17,15 +13,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Constant velocity animation
- * Created by Endos on 07.09.2015.
+ * Created by Endos on 15.09.2015.
  */
-public class LinearAnimationLogic extends AbstractAnimationLogic {
+public class BounceAnimationLogic extends AbstractAnimationLogic {
+
+    private final static float GRAVITATION = 2.f; //segmentsize/s²
+    private final static float FRICTION = 0.8f;
 
     private final Timer timer;
-
-    //velocity in unit segmentSize/s
-    private float velocity = 14.f;
 
     private DotsChangeHandler dotsChangeHandler = new DotsChangeHandler() {
         @Override
@@ -65,7 +60,7 @@ public class LinearAnimationLogic extends AbstractAnimationLogic {
         }
     };
 
-    public LinearAnimationLogic(ILogic logic, PixelToPitchConverter converter, TraceHandler traceHandler) {
+    public BounceAnimationLogic(ILogic logic, PixelToPitchConverter converter, TraceHandler traceHandler) {
         super(logic, converter, traceHandler);
 
         //register dot change handler
@@ -93,19 +88,51 @@ public class LinearAnimationLogic extends AbstractAnimationLogic {
 
     private void animateDot(AnimationDot animationDot) {
 
+        //cast the dot to a bounced animation dot
+        BounceAnimationDot bounceAnimationDot = (BounceAnimationDot) animationDot;
+
         //get the vertical position
-        float currentY = animationDot.getCurrentPosition().getY();
-        float desiredY = animationDot.getDesiredPosition().getY();
+        float currentY = bounceAnimationDot.getCurrentPosition().getY();
+        float desiredY = bounceAnimationDot.getDesiredPosition().getY();
+        float velocityY = bounceAnimationDot.getVelocity();
 
         //animation finished
         if(currentY == desiredY) {
             return;
         }
 
-        //animate the dot
-        float animationDistance = velocity * converter.getDescription().getSegmentSize() / FPS;
-        currentY = Math.min(desiredY, currentY + animationDistance);
-        animationDot.getCurrentPosition().setY(currentY);
+        //adjust velocity
+        float segmentSize = converter.getDescription().getSegmentSize();
+        velocityY = FRICTION * (velocityY + GRAVITATION * segmentSize /FPS);
+
+        //move distance
+        float animationDistance = velocityY * segmentSize / FPS;
+        currentY = currentY + animationDistance;
+
+        //check bounce
+        if(currentY > desiredY) {
+            if(velocityY < segmentSize * 0.1f) {
+                //stop it bouncing, it's close
+                velocityY = 0;
+                currentY = desiredY;
+            }
+            else {
+                //invert velocity and bounce at the desired y line
+                velocityY *= -1;
+                currentY = 2 * desiredY - currentY;
+            }
+        }
+
+        //update animation dot
+        bounceAnimationDot.setVelocity(velocityY);
+        bounceAnimationDot.getCurrentPosition().setY(currentY);
+    }
+
+    @Override
+    protected AnimationDot createAnimationDotFromLogicDot(LogicDot logicDot) {
+        AnimationDot animationDot = new BounceAnimationDot(logicDot);
+        updateDesiredPosition(animationDot);
+        return animationDot;
     }
 
     @Override
@@ -113,4 +140,3 @@ public class LinearAnimationLogic extends AbstractAnimationLogic {
         return dotsChangeHandler;
     }
 }
-

@@ -14,6 +14,7 @@ import android.view.View;
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.animation.AnimationDot;
 
+import com.icelandic_courses.elie.myfirstapp.animation.BounceAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.animation.FeedbackTrace;
 import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.animation.LinearAnimationLogic;
@@ -91,7 +92,7 @@ public class GameView extends View {
         traceHandler = new TraceHandler(logic, converter);
 
         //animation logic
-        animationLogic = new LinearAnimationLogic(logic, converter, traceHandler);
+        animationLogic = new BounceAnimationLogic(logic, converter, traceHandler);
 
         //set cell size, because the pitch size wasn't clear before
         setCellSize();

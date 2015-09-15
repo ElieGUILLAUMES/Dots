@@ -92,7 +92,7 @@ public abstract class AbstractAnimationLogic implements IAnimationLogic {
      * Updates the desired position of the animation dot
      * @param animationDot
      */
-    private void updateDesiredPosition(AnimationDot animationDot) {
+    protected void updateDesiredPosition(AnimationDot animationDot) {
 
         //transform pitch to pixels
         Position<Integer> logicDotPosition = animationDot.getLogicDot().getPosition();
