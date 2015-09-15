@@ -41,8 +41,8 @@ public class HighScoresActivity extends Activity {
         highScoreListView = (ListView) findViewById(R.id.highScores);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        highScores.add(new HighScore(GameMode.CLASSIC.toString(), prefs.getInt(GameMode.CLASSIC.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString(), prefs.getInt(GameMode.MOVES.toString(), 0)));
+        highScores.add(new HighScore(GameMode.CLASSIC.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString(), 0)));
+        highScores.add(new HighScore(GameMode.MOVES.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString(), 0)));
 
         highScoreAdapter = new HighScoreAdapter(this, highScores);
         highScoreListView.setAdapter(highScoreAdapter);
@@ -95,5 +95,11 @@ public class HighScoresActivity extends Activity {
 
             return rowView;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
+        super.onBackPressed();
     }
 }

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 
 public class GameFinishedActivity extends Activity {
 
@@ -53,7 +54,7 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void replay(View view){
-        if(intent.getStringExtra("gameType").equals("classic")){
+        if(intent.getStringExtra("gameType").equals(GameMode.CLASSIC.toString())){
             Intent intent = new Intent(this, ClassicGameActivity.class);
             startActivity(intent);
         } else {
