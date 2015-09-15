@@ -3,6 +3,7 @@ package com.icelandic_courses.elie.myfirstapp.view;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -24,6 +25,8 @@ import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 
 public class ClassicGameActivity extends Activity {
 
+    public final static String TAG = ClassicGameActivity.class.getSimpleName();
+
     private GameView gameView;
     private TextView remainingSecondsView;
     private TextView scoreView;
@@ -41,6 +44,7 @@ public class ClassicGameActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "onCreate");
 
         //settings
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -150,4 +154,14 @@ public class ClassicGameActivity extends Activity {
         this.finish();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setContentView(R.layout.activity_classic_game);
+    }
 }
