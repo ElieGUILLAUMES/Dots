@@ -1,4 +1,4 @@
-package com.icelandic_courses.elie.myfirstapp.logic;
+package com.icelandic_courses.elie.myfirstapp.logic.moves;
 
 /**
  * Created by Elie on 14.09.2015.

@@ -2,28 +2,12 @@ package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Vibrator;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
-import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
-import com.icelandic_courses.elie.myfirstapp.animation.NoAnimationLogic;
-import com.icelandic_courses.elie.myfirstapp.logic.GameState;
-import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
-import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
-import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
-import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
-import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
-import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class MyActivity extends Activity {
 

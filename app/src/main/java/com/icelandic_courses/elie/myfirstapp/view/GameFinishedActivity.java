@@ -53,7 +53,7 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void replay(View view){
-        if(intent.getStringExtra("gameType").equals("Classic")){
+        if(intent.getStringExtra("gameType").equals("classic")){
             Intent intent = new Intent(this, ClassicGameActivity.class);
             startActivity(intent);
         } else {

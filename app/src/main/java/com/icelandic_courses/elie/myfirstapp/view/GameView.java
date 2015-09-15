@@ -7,17 +7,19 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.animation.AnimationDot;
 
+import com.icelandic_courses.elie.myfirstapp.animation.FeedbackTrace;
 import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.animation.LinearAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
@@ -37,7 +39,7 @@ public class GameView extends View {
 
     private ILogic logic;
     private IAnimationLogic animationLogic;
-    private TrackingHandler trackingHandler;
+    private TraceHandler traceHandler;
     private PixelToPitchConverterDescription converterDescription;
 
     private RectF m_circle = new RectF();
@@ -86,10 +88,10 @@ public class GameView extends View {
         PixelToPitchConverter converter = new PixelToPitchConverter(converterDescription);
 
         //tracking handler
-        trackingHandler = new TrackingHandler(logic, converter);
+        traceHandler = new TraceHandler(logic, converter);
 
         //animation logic
-        animationLogic = new LinearAnimationLogic(logic, converter, trackingHandler);
+        animationLogic = new LinearAnimationLogic(logic, converter, traceHandler);
 
         //set cell size, because the pitch size wasn't clear before
         setCellSize();
@@ -140,18 +142,21 @@ public class GameView extends View {
 
     private void drawTrace(Canvas canvas) {
 
+        //get feedback trace
+        final FeedbackTrace trace = animationLogic.getFeedbackTrace();
+
         //set stroke width
         float strokeWidth = converterDescription.getSegmentSize() * 0.15f;
         m_paintLine.setStrokeWidth(strokeWidth);
 
         //trace color
-        int traceColor = getColor(animationLogic.getAnimatedTraceColor());
+        int traceColor = getColor(trace.getColor());
         int traceAlpha = 127;
         int traceColorAlpha = Color.argb(traceAlpha, Color.red(traceColor), Color.green(traceColor), Color.blue(traceColor));
 
         //draw trace
         Position<Float> previousPosition = null;
-        for(Position<Float> position : animationLogic.getAnimatedTracePositions()) {
+        for(Position<Float> position : trace.getPositions()) {
 
             //set color
             m_paintCircle.setColor(traceColorAlpha);
@@ -166,9 +171,16 @@ public class GameView extends View {
             }
             previousPosition = position;
         }
+
+        //draw line to last tracking point
+        drawLine(canvas, previousPosition, trace.getLastTrackingPoint());
     }
 
     private void drawLine(Canvas canvas, Position<Float> previousPosition, Position<Float> position) {
+        if(previousPosition == null || position == null) {
+            return;
+        }
+
         canvas.drawLine(
                 previousPosition.getX(),
                 previousPosition.getY(),
@@ -228,8 +240,8 @@ public class GameView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if(trackingHandler != null){
-            return trackingHandler.onTouchEvent(event);
+        if(traceHandler != null){
+            return traceHandler.onTouchEvent(event);
         }
 
         return super.onTouchEvent(event);

@@ -15,8 +15,7 @@ public interface IAnimationLogic {
     public final static int PERIOD = 1000 / FPS;
 
     public Collection<AnimationDot> getAnimationDots();
-    public List<Position<Float>> getAnimatedTracePositions();
-    public DotColor getAnimatedTraceColor();
+    public FeedbackTrace getFeedbackTrace();
 
     public void invalidate();
 }

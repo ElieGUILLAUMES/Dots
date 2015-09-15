@@ -1,8 +1,10 @@
 package com.icelandic_courses.elie.myfirstapp.logic;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChecker;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
@@ -18,9 +20,8 @@ public abstract class AbstractLogic implements ILogic {
 
     private final Collection<DotsChangeHandler> dotsChangeHandlers;
     private final Collection<GameStateChangeHandler> gameStateChangeHandlers;
+    private final Collection<TraceFinishHandler> traceFinishHandlers;
 
-
-    private final ScoreManager scoreManager;
     private GameState gameState = GameState.NOT_STARTED;
     private final int pitchSize;
     private final int numberDotColors;
@@ -35,10 +36,9 @@ public abstract class AbstractLogic implements ILogic {
         this.pitchSize = pitchSize;
         this.numberDotColors = numberDotColors;
         pitch = new LogicDot[pitchSize][pitchSize];
-        scoreManager = new ScoreManager();
-        dotsChangeHandlers = new ArrayList<DotsChangeHandler>();
-        gameStateChangeHandlers = new ArrayList<GameStateChangeHandler>();
-
+        dotsChangeHandlers = new ArrayList<>();
+        gameStateChangeHandlers = new ArrayList<>();
+        traceFinishHandlers = new ArrayList<>();
     }
 
     @Override
@@ -53,18 +53,23 @@ public abstract class AbstractLogic implements ILogic {
     }
 
     @Override
-    public synchronized void traceFinished(Position<Integer>[] trace) throws IllegalArgumentException {
+    public synchronized void traceFinished(Trace trace) throws IllegalArgumentException {
         if (gameState != GameState.RUNNING) {
             return; //do nothing, if the game is not running
         }
 
-        TraceChecker.check(trace, this);
+        //if trace hasn't at least 2 points, ignore it
+        if(trace == null || trace.getPositions().size() < 2) {
+            return;
+        }
+
+        //real logic: remove, shift and create dots
         int[] affectedColumns = removeDots(trace);
         shiftDown(affectedColumns);
         createDots(affectedColumns);
-        scoreManager.addTrace(trace);
 
-        Log.i("Pitch", toString());
+        //notify trace finished
+        notifyTraceFinished(trace);
     }
 
     @Override
@@ -73,26 +78,67 @@ public abstract class AbstractLogic implements ILogic {
     }
 
     /**
-     * Remove all dots in the trace from the pitch
+     * Remove all dots in the trace from the pitch.
+     * If there is a circle detected, it removes every dot with the same color.
      * @param trace
      * @return affected columns to be able to accelerate
      */
-    protected int[] removeDots(Position<Integer>[] trace) {
-        Set<Integer> affectedColumnsSet = new HashSet<Integer>();
+    protected int[] removeDots(Trace trace) {
+        int[] affectedColumns;
+        int numberAffectedDots = 0;
 
-        for(Position<Integer> dot : trace) {
-            removeDot(dot);
-            affectedColumnsSet.add(dot.getX());
+        if(trace.getNumberCircles() > 0) {
+            //circle detected: remove all dots with the same color
+            numberAffectedDots = removeDotsByColor(trace.getColor());
+
+            //assume all columns to be affected
+            affectedColumns = new int[pitchSize];
+            for(int i=0; i<pitchSize; i++) {
+                affectedColumns[i] = i;
+            }
+
+        }
+        else {
+            //no circle: remove all dots in the trace
+            Set<Integer> affectedColumnsSet = new HashSet<Integer>();
+            for(Position<Integer> dot : trace.getPositions()) {
+                removeDot(dot);
+                numberAffectedDots++;
+                affectedColumnsSet.add(dot.getX());
+            }
+
+            //convert Integer set to int array and return it
+            affectedColumns = new int[affectedColumnsSet.size()];
+            int i = 0;
+            for(Integer column : affectedColumnsSet) {
+                affectedColumns[i++] = column;
+            }
         }
 
-        //convert Integer set to int array and return it
-        int[] affectedColumns = new int[affectedColumnsSet.size()];
-        int i = 0;
-        for(Integer column : affectedColumnsSet) {
-            affectedColumns[i++] = column;
-        }
+        //let the trace now, how many dots were affected
+        trace.setNumberAffectedDots(numberAffectedDots);
 
         return affectedColumns;
+    }
+
+    /**
+     * Remove every dot with the given color
+     * @param color color of the trace
+     * @return number removed dots
+     */
+    private int removeDotsByColor(DotColor color) {
+        int numberRemovedDots = 0;
+
+        for(int row = 0; row<pitchSize; row++) {
+            for(int column = 0; column<pitchSize; column++) {
+                if(getDot(row, column).getColor() == color) {
+                    removeDot(new Position<Integer>(row, column));
+                    numberRemovedDots++;
+                }
+            }
+        }
+
+        return numberRemovedDots;
     }
 
     /**
@@ -227,25 +273,40 @@ public abstract class AbstractLogic implements ILogic {
         //TODO
     }
 
+    @Override
     public void registerDotsChangeHandler(DotsChangeHandler dotsChangeHandler) {
         dotsChangeHandlers.add(dotsChangeHandler);
     }
 
+    @Override
     public void unregisterDotsChangeHandler(DotsChangeHandler dotsChangeHandler) {
         dotsChangeHandlers.remove(dotsChangeHandler);
     }
 
+    @Override
     public void registerGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler) {
         gameStateChangeHandlers.add(gameStateChangeHandler);
     }
 
+    @Override
     public void unregisterGameStateChangeHandler(GameStateChangeHandler gameStateChangeHandler) {
         gameStateChangeHandlers.remove(gameStateChangeHandler);
     }
 
+    @Override
+    public void registerTraceFinishHandler(TraceFinishHandler traceFinishHandler) {
+        traceFinishHandlers.add(traceFinishHandler);
+    }
 
-    public ScoreManager getScoreManager() {
-        return scoreManager;
+    @Override
+    public void unregisterTraceFinishHandler(TraceFinishHandler traceFinishHandler) {
+        traceFinishHandlers.remove(traceFinishHandler);
+    }
+
+    private void notifyTraceFinished(Trace trace) {
+        for(TraceFinishHandler traceFinishHandler : traceFinishHandlers) {
+            traceFinishHandler.onTraceFinished(trace);
+        }
     }
 
     public GameState getGameState() {
@@ -259,7 +320,7 @@ public abstract class AbstractLogic implements ILogic {
         //notify listeners of changes
         if(oldState != gameState) {
             for(GameStateChangeHandler gameStateChangeHandler : gameStateChangeHandlers) {
-                gameStateChangeHandler.gameStateChanged(gameState);
+                gameStateChangeHandler.gameStateChanged(gameState, this);
             }
         }
     }
@@ -297,4 +358,7 @@ public abstract class AbstractLogic implements ILogic {
 
         return str;
     }
+
+    @Override
+    public abstract String getMode();
 }

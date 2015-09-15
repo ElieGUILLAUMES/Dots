@@ -1,4 +1,4 @@
-package com.icelandic_courses.elie.myfirstapp.logic;
+package com.icelandic_courses.elie.myfirstapp.logic.time;
 
 /**
  * Created by Elie on 14.09.2015.

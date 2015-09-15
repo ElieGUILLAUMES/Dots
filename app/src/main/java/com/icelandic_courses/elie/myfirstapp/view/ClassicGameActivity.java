@@ -15,11 +15,12 @@ import android.widget.TextView;
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.logic.RemainingSecondsHandler;
-import com.icelandic_courses.elie.myfirstapp.logic.TimedLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
+import com.icelandic_courses.elie.myfirstapp.logic.time.RemainingSecondsHandler;
+import com.icelandic_courses.elie.myfirstapp.logic.time.TimedLogic;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 
 public class ClassicGameActivity extends Activity {
 
@@ -28,11 +29,8 @@ public class ClassicGameActivity extends Activity {
     private TextView scoreView;
     private TextView bestScoreView;
 
-    private TrackingHandler trackingHandler;
+    private TraceHandler traceHandler;
     private SharedPreferences prefs;
-
-    private int remainingSeconds = 30;
-    private int score = 0;
 
     private TimedLogic logic;
     private ScoreManager scoreManager;
@@ -44,7 +42,9 @@ public class ClassicGameActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //settings
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int seconds = 30;
         int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
         int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
 
@@ -54,18 +54,15 @@ public class ClassicGameActivity extends Activity {
         scoreView = (TextView) findViewById(R.id.score);
         bestScoreView = (TextView) findViewById(R.id.bestScore);
 
-        remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, remainingSeconds));
+        remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, seconds));
         scoreView.setText(getResources().getString(R.string.score, 0));
         bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("bestScoreClassicMode",0)));
 
-        //settings
-        //int moves = 30;
-        //int numberColors = 3;
-        //int pitchSize = 6;
+        vibe = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
 
         //init logic with basic settings
         logic = new TimedLogic(
-                remainingSeconds,
+                seconds,
                 pitchSize,
                 numberColors
         );
@@ -73,30 +70,34 @@ public class ClassicGameActivity extends Activity {
         //game state change handler
         logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
             @Override
-            public void gameStateChanged(GameState gameState) {
-                Log.i("Game state changed", gameState.toString());
-                if(gameState.toString().equals(GameState.FINISHED.toString())){
+            public void gameStateChanged(GameState gameState, ILogic logic) {
+                //game finished
+                if (gameState == GameState.FINISHED) {
                     launchGameFinishedActivity();
                 }
             }
         });
 
-        vibe = (Vibrator) getSystemService(this.VIBRATOR_SERVICE);
-
         logic.registerRemainingSecondsHandler(new RemainingSecondsHandler() {
             @Override
             public void remainingSecondsChanged(int seconds) {
-                changeRemainingSecondsView(seconds);
-                Log.i("RemainingSeconds :", getString(seconds));
+                // update remaining seconds
+                remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, seconds));
             }
         });
 
-        scoreManager = logic.getScoreManager();
+        scoreManager = new ScoreManager(logic, prefs);
         scoreManager.registerScoreChangeHandler(new ScoreChangeHandler() {
             @Override
             public void scoreChanged(int total, int additional) {
-                changeScoreView(total);
-                Log.i("Score changed", String.valueOf(total));
+
+                //vibration
+                if (prefs.getBoolean("vibration", false)) {
+                    vibe.vibrate(100);
+                }
+
+                // update score
+                scoreView.setText(getResources().getString(R.string.score, total));
             }
         });
 
@@ -108,44 +109,6 @@ public class ClassicGameActivity extends Activity {
 
         //redraw
         gameView.invalidate();
-
-        // initialization of the best score
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if(!prefs.contains("bestScoreClassicMode")){
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("bestScoreClassicMode", 0);
-            editor.commit();
-        }
-
-        // check if the number of remainingMoves has changed every 30ms
-        final Runnable remainingSecondsRunnable = new Runnable() {
-            public void run() {
-                remainingSecondsHandler.postDelayed(this, 30);
-                // if a move is done ==> check if vibrate
-                if(remainingSeconds != logic.getRemainingSeconds()){
-                    // update remaining moves
-                    remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, logic.getRemainingSeconds()));
-                    remainingSeconds = logic.getRemainingSeconds();
-                }
-
-                if(score != scoreManager.getTotalScore()){
-                    if(prefs.getBoolean("vibration", false)){
-                        vibe.vibrate(100);
-                    }
-                }
-
-                // update score
-                scoreView.setText(getResources().getString(R.string.score, score));
-                if(remainingSeconds == 0){
-                    if(prefs.getInt("bestScoreClassicMode", 0) < score){
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("bestScoreClassicMode", scoreManager.getTotalScore());
-                        editor.commit();
-                    };
-                }
-            }
-        };
-        remainingSecondsHandler.postDelayed(remainingSecondsRunnable, 0);
 
     }
 
@@ -171,26 +134,19 @@ public class ClassicGameActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void changeRemainingSecondsView(int seconds){
-        remainingSeconds = seconds;
-    }
-
-    private void changeScoreView(int score){
-        this.score = score;
-    }
-
     private void launchGameFinishedActivity(){
         Intent intent = new Intent(this, GameFinishedActivity.class);
-        intent.putExtra("gameType", "Classic");
-        intent.putExtra("score", score);
-        intent.putExtra("highScore", prefs.getInt("bestScoreClassicMode",0));
+        intent.putExtra("gameType", logic.getMode());
+        intent.putExtra("score", scoreManager.getScore());
+        intent.putExtra("highScore", prefs.getInt("highscore"+logic.getMode(),0));
         startActivity(intent);
         this.finish();
     }
 
     @Override
     public void onBackPressed() {
-        logic.stop();
+        //TODO maybe pause and not finish the logic
+        logic.finish();
         this.finish();
     }
 

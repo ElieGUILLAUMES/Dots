@@ -1,7 +1,9 @@
-package com.icelandic_courses.elie.myfirstapp.logic;
+package com.icelandic_courses.elie.myfirstapp.logic.time;
 
 import android.os.CountDownTimer;
 import android.util.Log;
+
+import com.icelandic_courses.elie.myfirstapp.logic.AbstractLogic;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,14 +36,13 @@ public class TimedLogic extends AbstractLogic {
 
             public void onTick(long millisUntilFinished) {
                 remainingMillis = millisUntilFinished;
-                Log.i("Remaining time", remainingMillis + " milliseconds");
-                //TODO notify GUI
+                notifyRemainingSecondsChanged();
             }
 
             public void onFinish() {
                 remainingMillis = 0;
-                Log.i("Finished!", " Remaining time: " + remainingMillis + " milliseconds");
                 finish();
+                notifyRemainingSecondsChanged();
             }
         };
     }
@@ -61,17 +62,14 @@ public class TimedLogic extends AbstractLogic {
         remainingSecondsHandlers.remove(remainingSecondsHandler);
     }
 
-    public int getRemainingSeconds() {
-        return (int) remainingMillis/1000;
-    }
-
-    public void setRemainingSecondsLeft(int remainingMillis){
+    public void notifyRemainingSecondsChanged(){
         for(RemainingSecondsHandler remainingSecondsHandler : remainingSecondsHandlers) {
-            remainingSecondsHandler.remainingSecondsChanged(remainingMillis/1000);
+            remainingSecondsHandler.remainingSecondsChanged((int) remainingMillis/1000);
         }
     }
 
-    public void stop(){
-        timer.cancel();
+    @Override
+    public String getMode() {
+        return "classic";
     }
 }

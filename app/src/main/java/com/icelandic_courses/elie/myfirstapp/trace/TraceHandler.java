@@ -1,44 +1,34 @@
 package com.icelandic_courses.elie.myfirstapp.trace;
 
-import android.os.Trace;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
-import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
-import com.icelandic_courses.elie.myfirstapp.util.Orientation;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 import com.icelandic_courses.elie.myfirstapp.util.Segment;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Endos on 09.09.2015.
  */
-public class TrackingHandler {
+public class TraceHandler {
 
-    private final static double MIN_DISTANCE_FACTOR = 0.45; // has to be between 0.0 and 0.5
+    private final static double MIN_DISTANCE_FACTOR = 0.5; // has to be between 0.0 and 0.5
 
     private final ILogic logic;
     private final PixelToPitchConverter converter;
+    private final Trace trace;
+
     private final Collection<TraceChangeHandler> traceChangeHandlers;
 
-    private DotColor traceColor = null;
-    private List<Position<Integer>> trace;
-    private Set<Segment> segments;
-    private Position<Float> startTrackingPoint = null;
-
-    public TrackingHandler(ILogic logic, PixelToPitchConverter converter) {
+    public TraceHandler(ILogic logic, PixelToPitchConverter converter) {
         this.logic = logic;
         this.converter = converter;
-        trace = new ArrayList<>();
-        segments = new HashSet<>();
+        trace = new Trace();
         traceChangeHandlers = new ArrayList<>();
     }
 
@@ -71,35 +61,41 @@ public class TrackingHandler {
         Log.i("StartTrack", trackingPoint.toString());
 
         //set the starting point
-        startTrackingPoint = trackingPoint;
+        trace.setStartTrackingPoint(trackingPoint);
     }
 
     protected void track(Position<Float> trackingPoint) {
-        //Log.i("track", trackingPoint.toString());
         //initialize the start of the segment
         Position<Integer> segmentPitchStart;
         Position<Float> segmentStart;
-        if(trace.isEmpty()) {
-            Log.i("track", "really looking for the first pos");
-            segmentPitchStart = converter.transformPixelToPitch(startTrackingPoint);
-            segmentStart = startTrackingPoint;
+        if(trace.getPositions().isEmpty()) {
+            //use the first tracking point as the start of the segment
+            Position<Float> start = trace.getStartTrackingPoint();
+            segmentPitchStart = converter.transformPixelToPitch(start);
+            segmentStart = start;
         }
         else {
-            segmentPitchStart = trace.get(trace.size() - 1);
+            //use the last trace point as the start of the segment
+            segmentPitchStart = trace.getLastPosition();
             segmentStart = converter.transformPitchToPixel(segmentPitchStart);
         }
-
 
         //list of potential starting points, including the nearest point
         List<Position<Integer>> potentialStartingPoints = getPotentialNeighbors(segmentPitchStart);
 
         //if the trace is empty, you add the segmentPitchStart to the potential points at the beginning
-        if(trace.isEmpty()) {
+        if(trace.getPositions().isEmpty()) {
             potentialStartingPoints.add(0, segmentPitchStart);
         }
 
         //find starting point and other matching points
         captureNextTracePoints(segmentPitchStart, potentialStartingPoints, segmentStart, trackingPoint);
+
+        //set last tracking point
+        trace.setLastTrackingPoint(trackingPoint);
+
+        //notify TraceChangeHandler
+        notifyLastTrackingPointChanged();
     }
 
     protected void captureNextTracePoints(
@@ -123,20 +119,34 @@ public class TrackingHandler {
             }
 
             //check color
-            if(traceColor != null && traceColor != logic.getDot(potentialPoint).getColor()) {
+            if(trace.getColor() != null && trace.getColor() != logic.getDot(potentialPoint).getColor()) {
                 //the dot at the potential position has another color, this point is not usable
-                continue;
-            }
-
-            //check for segment duplicates
-            if(segments.contains(new Segment(referencePoint, potentialPoint))) {
-                //the segment is already in use, this point is not usable
                 continue;
             }
 
             Position<Float> pixelPotentialPoint = converter.transformPitchToPixel(potentialPoint);
             double closestDistanceToSegment = pixelPotentialPoint.distanceToSegment(segmentStart, segmentEnd);
             if(closestDistanceToSegment <= minDistance) {
+
+                //check for segment duplicates
+                if(trace.getSegments().contains(new Segment(referencePoint, potentialPoint))) {
+
+                    //the segment is already in use, this point is not usable
+                    continue;
+
+                    //TODO go back
+                    /*//check, if the user wants to go back
+                    if(referencePoint.equals(trace.getLastPosition())) {
+                        //go back: remove latest point
+                        trace.removeLastPosition();
+                        break;
+                    }
+                    else {
+                        //the segment is already in use, this point is not usable
+                        continue;
+                    }*/
+                }
+
                 //found the next trace point and update the next potential points
                 addTracePoint(potentialPoint);
                 potentialPoints = getPotentialNeighbors(potentialPoint);
@@ -147,25 +157,12 @@ public class TrackingHandler {
     }
 
     private void addTracePoint(Position<Integer> point) {
-        Log.i("addTracePoint", point.toString());
-        //add a segment if there is already a point in the trace
-        if(!trace.isEmpty()) {
-            Position<Integer> lastPoint = trace.get(trace.size() - 1);
-            segments.add(new Segment(lastPoint, point));
-        }
 
-        //set trace color
-        if(traceColor == null) {
-            traceColor = logic.getDot(point).getColor();
-        }
-
-        //add to trace
-        trace.add(point);
-
-        Log.i("trace", trace.toString());
+        //add point to trace
+        trace.addPoint(point, logic.getDot(point).getColor());
 
         //notify listeners
-        notifyTraceChangeHandlers();
+        notifyTraceChanged();
     }
 
     private List<Position<Integer>> getPotentialNeighbors(final Position<Integer> referencePoint) {
@@ -179,16 +176,14 @@ public class TrackingHandler {
 
     protected void finishTracking(Position<Float> trackingPoint)
     {
-        Log.i("finishTracking", trackingPoint.toString());
         //use the last point as tracking point, too
         track(trackingPoint);
 
         //convert list to array and pass it to the logic component
-        Position<Integer>[] traceArray = (Position<Integer>[]) trace.toArray(new Position[]{});
         try{
-            logic.traceFinished(traceArray);
+            logic.traceFinished(trace);
         }catch(IllegalArgumentException e){
-            Log.e("TrackingHandler", e.getMessage());
+            Log.e("TraceHandler", e.getMessage());
         }
 
 
@@ -201,27 +196,24 @@ public class TrackingHandler {
         //clear the trace
         trace.clear();
 
-        //clear trace color
-        traceColor = null;
-
-        //clear segments
-        segments.clear();
-
-        //clear prev tracking point
-        startTrackingPoint = null;
-
         //notify handler
-        notifyTraceChangeHandlers();
+        notifyTraceChanged();
     }
 
-    public List<Position<Integer>> getTrace() {
+    public Trace getTrace() {
         return trace;
     }
 
 
-    public void notifyTraceChangeHandlers() {
+    public void notifyTraceChanged() {
         for(TraceChangeHandler traceChangeHandler : traceChangeHandlers) {
-            traceChangeHandler.onTraceChange(trace, traceColor);
+            traceChangeHandler.onTraceChanged(trace);
+        }
+    }
+
+    public void notifyLastTrackingPointChanged() {
+        for(TraceChangeHandler traceChangeHandler : traceChangeHandlers) {
+            traceChangeHandler.onLastTrackingPointChanged(trace.getLastTrackingPoint());
         }
     }
 

@@ -1,11 +1,11 @@
-package com.icelandic_courses.elie.myfirstapp.logic;
+package com.icelandic_courses.elie.myfirstapp.logic.moves;
 
-import android.os.Vibrator;
 import android.util.Log;
 
+import com.icelandic_courses.elie.myfirstapp.logic.AbstractLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.util.Position;
-import com.icelandic_courses.elie.myfirstapp.view.MyActivity;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,11 +27,10 @@ public class LimitedMovesLogic extends AbstractLogic {
         remainingMoves = totalMoves;
         remainingMovesHandlers = new ArrayList<RemainingMovesHandler>();
         scoreChangeHandlers = new ArrayList<ScoreChangeHandler>();
-        setRemainingMovesLeft(remainingMoves);
     }
 
     @Override
-    public void traceFinished(Position<Integer>[] trace) throws IllegalArgumentException {
+    public void traceFinished(Trace trace) throws IllegalArgumentException {
 
         //if the game is not running, do nothing
         if(getGameState() != GameState.RUNNING) {
@@ -40,11 +39,22 @@ public class LimitedMovesLogic extends AbstractLogic {
 
         super.traceFinished(trace);
 
-        //move was successful: decrease moves and check if the game is finished
-        if(--remainingMoves <= 0) {
+        //move was successful: decrease moves
+        remainingMoves--;
+
+        //notify handlers
+        notifyRemainingMovesChanged();
+
+        //finish the game if there is no move left
+        if(remainingMoves <= 0) {
             finish();
         }
-        Log.i("Remaining moves", remainingMoves + "");
+    }
+
+    private void notifyRemainingMovesChanged() {
+        for(RemainingMovesHandler remainingMovesHandler : remainingMovesHandlers) {
+            remainingMovesHandler.remainingMovesChanged(remainingMoves);
+        }
     }
 
     public void registerRemainingMoveHandler(RemainingMovesHandler remainingMovesHandler) {
@@ -55,14 +65,9 @@ public class LimitedMovesLogic extends AbstractLogic {
         remainingMovesHandlers.remove(remainingMovesHandler);
     }
 
-    public int getRemainingMoves() {
-        return remainingMoves;
-    }
-
-    public void setRemainingMovesLeft(int remainingMoves){
-        for(RemainingMovesHandler remainingMovesHandler : remainingMovesHandlers) {
-            remainingMovesHandler.remainingMovesChanged(remainingMoves);
-        }
+    @Override
+    public String getMode() {
+        return "moves";
     }
 
 }

@@ -7,7 +7,7 @@ package com.icelandic_courses.elie.myfirstapp.animation;
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
@@ -65,8 +65,8 @@ public class LinearAnimationLogic extends AbstractAnimationLogic {
         }
     };
 
-    public LinearAnimationLogic(ILogic logic, PixelToPitchConverter converter, TrackingHandler trackingHandler) {
-        super(logic, converter, trackingHandler);
+    public LinearAnimationLogic(ILogic logic, PixelToPitchConverter converter, TraceHandler traceHandler) {
+        super(logic, converter, traceHandler);
 
         //register dot change handler
         logic.registerDotsChangeHandler(dotsChangeHandler);

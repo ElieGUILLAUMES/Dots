@@ -10,6 +10,7 @@ import java.util.List;
  */
 public interface TraceChangeHandler {
 
-    public void onTraceChange(List<Position<Integer>> trace, DotColor color);
+    public void onTraceChanged(Trace trace);
+    public void onLastTrackingPointChanged(Position<Float> lastTrackingPoint);
 
 }

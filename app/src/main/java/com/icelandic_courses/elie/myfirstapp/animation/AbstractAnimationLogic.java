@@ -4,8 +4,9 @@ import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
@@ -22,45 +23,45 @@ public abstract class AbstractAnimationLogic implements IAnimationLogic {
 
     protected final ILogic logic;
     protected final PixelToPitchConverter converter;
-    protected final TrackingHandler trackingHandler;
+    protected final TraceHandler traceHandler;
 
-    private final List<Position<Float>> animatedTrace;
-    private DotColor animatedTraceColor = null;
+    private final FeedbackTrace feedbackTrace;
 
     private Collection<AnimationDot> dotsList = new ArrayList<AnimationDot>();
     private Map<Integer, AnimationDot> dotsMap = new HashMap<Integer, AnimationDot>();
 
-    public AbstractAnimationLogic(ILogic logic, PixelToPitchConverter converter, TrackingHandler trackingHandler) {
+    public AbstractAnimationLogic(ILogic logic, PixelToPitchConverter converter, TraceHandler traceHandler) {
         this.logic = logic;
         this.converter = converter;
-        this.trackingHandler = trackingHandler;
+        this.traceHandler = traceHandler;
 
-        //trace animation
-        animatedTrace = new ArrayList<>();
-        trackingHandler.registerTraceChangeHandler(new TraceChangeHandler() {
+        //trace feedback
+        feedbackTrace = new FeedbackTrace();
+        traceHandler.registerTraceChangeHandler(new TraceChangeHandler() {
             @Override
-            public void onTraceChange(List<Position<Integer>> trace, DotColor color) {
-                updateAnimatedTrace(trace, color);
+            public void onTraceChanged(Trace trace) {
+                updateAnimatedTrace(trace);
+            }
+
+            @Override
+            public void onLastTrackingPointChanged(Position<Float> lastTrackingPoint) {
+                feedbackTrace.setLastTrackingPoint(lastTrackingPoint);
             }
         });
     }
 
-    private void updateAnimatedTrace(List<Position<Integer>> trace, DotColor color) {
-        animatedTrace.clear();
-        animatedTraceColor = color;
+    private void updateAnimatedTrace(Trace trace) {
+        feedbackTrace.getPositions().clear();
+        feedbackTrace.setColor(trace.getColor());
 
-        for(Position<Integer> pitchPosition : trace) {
-            animatedTrace.add(converter.transformPitchToPixel(pitchPosition));
+        for(Position<Integer> pitchPosition : trace.getPositions()) {
+            feedbackTrace.getPositions().add(converter.transformPitchToPixel(pitchPosition));
         }
     }
 
-    public List<Position<Float>> getAnimatedTracePositions() {
-        return animatedTrace;
-    }
-
     @Override
-    public DotColor getAnimatedTraceColor() {
-        return animatedTraceColor;
+    public FeedbackTrace getFeedbackTrace() {
+        return feedbackTrace;
     }
 
     /**

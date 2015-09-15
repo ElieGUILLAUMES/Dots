@@ -15,11 +15,12 @@ import android.widget.TextView;
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.logic.LimitedMovesLogic;
-import com.icelandic_courses.elie.myfirstapp.logic.RemainingMovesHandler;
+import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
+import com.icelandic_courses.elie.myfirstapp.logic.moves.LimitedMovesLogic;
+import com.icelandic_courses.elie.myfirstapp.logic.moves.RemainingMovesHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
-import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 
 public class MovesGameActivity extends Activity {
 
@@ -28,44 +29,33 @@ public class MovesGameActivity extends Activity {
     private TextView scoreView;
     private TextView bestScoreView;
 
-    private TrackingHandler trackingHandler;
     private SharedPreferences prefs;
-
-    private int remainingMoves = 30;
-    private int score = 0;
 
     private LimitedMovesLogic logic;
     private ScoreManager scoreManager;
 
-    final Handler remainingMovesHandler = new Handler();
     private Vibrator vibe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_moves_game);
 
+        //settings
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int totalMoves = 30;
         int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
         int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
 
-        setContentView(R.layout.activity_moves_game);
+        //get views
         gameView = (GameView) findViewById(R.id.gameView);
         remainingMovesView = (TextView) findViewById(R.id.remainingMoves);
         scoreView = (TextView) findViewById(R.id.score);
         bestScoreView = (TextView) findViewById(R.id.bestScore);
 
-        remainingMovesView.setText(getResources().getString(R.string.remainingMoves, remainingMoves));
-        scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("bestScoreMovesMode",0)));
-
-        //settings
-        //int moves = 30;
-        //int numberColors = 3;
-        //int pitchSize = 6;
-
         //init logic with basic settings
         logic = new LimitedMovesLogic(
-                remainingMoves,
+                totalMoves,
                 pitchSize,
                 numberColors
         );
@@ -73,9 +63,8 @@ public class MovesGameActivity extends Activity {
         //game state change handler
         logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
             @Override
-            public void gameStateChanged(GameState gameState) {
-                Log.i("Game state changed", gameState.toString());
-                if(gameState.toString().equals(GameState.FINISHED.toString())){
+            public void gameStateChanged(GameState gameState, ILogic logic) {
+                if(gameState == GameState.FINISHED){
                     launchGameFinishedActivity();
                 }
             }
@@ -86,17 +75,22 @@ public class MovesGameActivity extends Activity {
         logic.registerRemainingMoveHandler(new RemainingMovesHandler() {
             @Override
             public void remainingMovesChanged(int remainingMoves) {
-                changeRemainingMovesView(remainingMoves);
-                Log.i("RemainingMoves changed", getString(remainingMoves));
+                remainingMovesView.setText(getResources().getString(R.string.remainingMoves, remainingMoves));
             }
         });
 
-        scoreManager = logic.getScoreManager();
+        scoreManager = new ScoreManager(logic, prefs);
         scoreManager.registerScoreChangeHandler(new ScoreChangeHandler() {
             @Override
             public void scoreChanged(int total, int additional) {
-                changeScoreView(total);
-                Log.i("Score changed", String.valueOf(total));
+
+                //vibration
+                if (prefs.getBoolean("vibration", false)) {
+                    vibe.vibrate(100);
+                }
+
+                // update score
+                scoreView.setText(getResources().getString(R.string.score, total));
             }
         });
 
@@ -109,39 +103,10 @@ public class MovesGameActivity extends Activity {
         //redraw
         gameView.invalidate();
 
-        // initialization of the best score
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if(!prefs.contains("bestScoreMovesMode")){
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putInt("bestScoreMovesMode", 0);
-            editor.commit();
-        }
-
-        // check if the number of remainingMoves has changed every 30ms
-        final Runnable remainingMovesRunnable = new Runnable() {
-            public void run() {
-                remainingMovesHandler.postDelayed(this, 30);
-                // if a move is done ==> check if vibrate
-                if(remainingMoves != logic.getRemainingMoves()){
-                    if(prefs.getBoolean("vibration", false)){
-                        vibe.vibrate(100);
-                    }
-                }
-                // update remaining moves
-                remainingMovesView.setText(getResources().getString(R.string.remainingMoves, logic.getRemainingMoves()));
-                remainingMoves = logic.getRemainingMoves();
-                // update score
-                scoreView.setText(getResources().getString(R.string.score, score));
-                if(remainingMoves == 0){
-                    if(prefs.getInt("bestScoreMovesMode", 0) < score){
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putInt("bestScoreMovesMode", scoreManager.getTotalScore());
-                        editor.commit();
-                    };
-                }
-            }
-        };
-        remainingMovesHandler.postDelayed(remainingMovesRunnable, 0);
+        //set texts
+        remainingMovesView.setText(getResources().getString(R.string.remainingMoves, totalMoves));
+        scoreView.setText(getResources().getString(R.string.score, 0));
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore"+logic.getMode(), 0)));
     }
 
     @Override
@@ -166,25 +131,18 @@ public class MovesGameActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void changeRemainingMovesView(int remainingMoves){
-        this.remainingMoves = remainingMoves;
-    }
-
-    private void changeScoreView(int score){
-        this.score = score;
-    }
-
     private void launchGameFinishedActivity(){
         Intent intent = new Intent(this, GameFinishedActivity.class);
-        intent.putExtra("gameType", "Classic");
-        intent.putExtra("score", score);
-        intent.putExtra("highScore", prefs.getInt("bestScoreMovesMode",0));
+        intent.putExtra("gameType", logic.getMode());
+        intent.putExtra("score", scoreManager.getScore());
+        intent.putExtra("highScore", prefs.getInt("highscore"+logic.getMode(),0));
         startActivity(intent);
         this.finish();
     }
 
     @Override
     public void onBackPressed() {
+        logic.finish();
         this.finish();
     }
 

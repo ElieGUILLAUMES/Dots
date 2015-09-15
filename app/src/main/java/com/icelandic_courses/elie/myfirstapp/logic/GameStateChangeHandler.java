@@ -5,6 +5,6 @@ package com.icelandic_courses.elie.myfirstapp.logic;
  */
 public interface GameStateChangeHandler {
 
-    public void gameStateChanged(GameState gameState);
+    public void gameStateChanged(GameState gameState, ILogic logic);
 
 }
