@@ -77,7 +77,7 @@ public class GameView extends View {
         this.logic = logic;
 
         //settings
-        int padding = 10;
+        int padding = 20;
         int pixelSize = Math.min(getWidth(), getHeight());
 
         // pixel <--> pitch converter
@@ -147,7 +147,7 @@ public class GameView extends View {
         final FeedbackTrace trace = animationLogic.getFeedbackTrace();
 
         //set stroke width
-        float strokeWidth = converterDescription.getSegmentSize() * 0.15f;
+        float strokeWidth = converterDescription.getSegmentSize() * 0.1f;
         m_paintLine.setStrokeWidth(strokeWidth);
 
         //trace color
@@ -155,16 +155,16 @@ public class GameView extends View {
         int traceAlpha = 127;
         int traceColorAlpha = Color.argb(traceAlpha, Color.red(traceColor), Color.green(traceColor), Color.blue(traceColor));
 
+        //set color
+        m_paintCircle.setColor(traceColorAlpha);
+        m_paintLine.setColor(traceColor);
+
         //draw trace
         Position<Float> previousPosition = null;
         for(Position<Float> position : trace.getPositions()) {
 
-            //set color
-            m_paintCircle.setColor(traceColorAlpha);
-            m_paintLine.setColor(traceColorAlpha);
-
             //draw dots
-            drawCircle(canvas, position, 0.9f);
+            drawCircle(canvas, position, 0.8f);
 
             //draw lines
             if(previousPosition != null) {
@@ -174,6 +174,7 @@ public class GameView extends View {
         }
 
         //draw line to last tracking point
+        m_paintLine.setColor(traceColorAlpha);
         drawLine(canvas, previousPosition, trace.getLastTrackingPoint());
     }
 
@@ -201,7 +202,7 @@ public class GameView extends View {
         //draw dots
         for(AnimationDot animationDot : animationLogic.getAnimationDots()) {
             setPaintColor(m_paintCircle, animationDot.getColor());
-            drawCircle(canvas, animationDot.getCurrentPosition(), 0.8f);
+            drawCircle(canvas, animationDot.getCurrentPosition(), 0.7f);
         }
     }
 

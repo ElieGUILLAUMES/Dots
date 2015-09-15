@@ -17,8 +17,8 @@ import java.util.TimerTask;
  */
 public class BounceAnimationLogic extends AbstractAnimationLogic {
 
-    private final static float GRAVITATION = 2.f; //segmentsize/s²
-    private final static float FRICTION = 0.8f;
+    private final static float GRAVITATION = 2.f; // segmentsize/s²
+    private final static float FRICTION = 12.f; // friction / s
 
     private final Timer timer;
 
@@ -103,7 +103,7 @@ public class BounceAnimationLogic extends AbstractAnimationLogic {
 
         //adjust velocity
         float segmentSize = converter.getDescription().getSegmentSize();
-        velocityY = FRICTION * (velocityY + GRAVITATION * segmentSize /FPS);
+        velocityY = (1-FRICTION/FPS) * (velocityY + GRAVITATION * segmentSize /FPS);
 
         //move distance
         float animationDistance = velocityY * segmentSize / FPS;
