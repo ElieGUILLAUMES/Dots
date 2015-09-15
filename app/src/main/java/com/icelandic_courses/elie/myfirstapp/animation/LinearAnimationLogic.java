@@ -11,6 +11,8 @@ import com.icelandic_courses.elie.myfirstapp.trace.TrackingHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -80,7 +82,11 @@ public class LinearAnimationLogic extends AbstractAnimationLogic {
     }
 
     private void animateDots() {
-        for(AnimationDot animationDot : getAnimationDots()) {
+        //copy dots to prevent concurrent modification exception
+        Collection<AnimationDot> animationDots = new ArrayList<>(getAnimationDots());
+
+        //iterate through copied collection
+        for(AnimationDot animationDot : animationDots) {
             animateDot(animationDot);
         }
     }
