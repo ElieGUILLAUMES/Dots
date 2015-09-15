@@ -18,7 +18,15 @@
 
     <!-- Game -->
     <string name="remainingMoves"><b>Moves left :</b> %1$d</string>
+    <string name="remainingSeconds"><b>Seconds left :</b> %1$d</string>
     <string name="score"><b>Score :</b> %1$d</string>
     <string name="best_score"><b>Best Score :</b> %1$d</string>
+    <string name="title_activity_game_finished">GameFinished</string>
+
+    <!-- Game Finished -->
+    <string name="game_finished_scoreText">Score</string>
+    <string name="game_finished_hishScoreText">HighScore</string>
+    <string name="replay">Replay</string>
+    <string name="menu">Menu</string>
 
 </resources>

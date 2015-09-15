@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.icelandic_courses.elie.myfirstapp" >
 
-    <uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -37,6 +37,10 @@
         <activity
             android:name=".view.PreferenceActivity"
             android:label="@string/title_activity_preference" >
+        </activity>
+        <activity
+            android:name=".view.GameFinishedActivity"
+            android:label="@string/title_activity_game_finished" >
         </activity>
     </application>
 

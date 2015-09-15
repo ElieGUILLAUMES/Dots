@@ -12,4 +12,9 @@
     <!-- Game -->
     <dimen name="game_text_size">16sp</dimen>
 
+    <!-- Game Finisehed -->
+    <dimen name="game_finished_text_size">24sp</dimen>
+    <dimen name="game_finished_score_size">56sp</dimen>
+    <dimen name="vertical_space_between_part">32dp</dimen>
+
 </resources>

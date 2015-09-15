@@ -71,7 +71,7 @@ public class MyActivity extends Activity {
         startActivity(intent);
     }
 
-    public void highscore(View view){
+    public void highScore(View view){
 
     }
 

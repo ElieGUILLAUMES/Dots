@@ -12,10 +12,10 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/remainingMoves"
+            android:id="@+id/remainingSeconds"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/remainingMoves"
+            android:text="@string/remainingSeconds"
             android:layout_weight="1"
             android:gravity="center"
             android:textSize="@dimen/game_text_size"/>
