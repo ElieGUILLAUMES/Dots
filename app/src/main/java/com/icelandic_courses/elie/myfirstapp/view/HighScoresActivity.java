@@ -19,6 +19,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 import com.icelandic_courses.elie.myfirstapp.logic.time.TimedLogic;
 import com.icelandic_courses.elie.myfirstapp.score.HighScore;
@@ -106,8 +107,12 @@ public class HighScoresActivity extends Activity {
 
     private void resetHighScores(){
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("highscore" + GameMode.CLASSIC.toString(), 0);
-        editor.putInt("highscore" + GameMode.MOVES.toString(), 0);
+        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.EASY.toString(), 0);
+        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.MIDDLE.toString(), 0);
+        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.HARD.toString(), 0);
+        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.EASY.toString(), 0);
+        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.MIDDLE.toString(), 0);
+        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.HARD.toString(), 0);
         editor.commit();
         createHighScoreList();
         highScoreAdapter.notifyDataSetChanged();
@@ -115,8 +120,12 @@ public class HighScoresActivity extends Activity {
 
     private void createHighScoreList(){
         highScores.clear();
-        highScores.add(new HighScore(GameMode.CLASSIC.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString(), 0)));
+        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.EASY.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.EASY.toString(), 0)));
+        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.MIDDLE.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.MIDDLE.toString(), 0)));
+        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.HARD.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.HARD.toString(), 0)));
+        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.EASY.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.EASY.toString(), 0)));
+        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.MIDDLE.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.MIDDLE.toString(), 0)));
+        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.HARD.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.HARD.toString(), 0)));
     }
 
     public void alertBeforeDeleteHighScores(View view){

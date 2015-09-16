@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
@@ -23,6 +24,12 @@ import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 
 public class MovesGameActivity extends Activity {
+
+    private final int TOTAL_MOVES = 30;
+    private int pitchSize;
+    private int numberColors;
+
+    private String difficulty;
 
     private GameView gameView;
     private TextView remainingMovesView;
@@ -43,9 +50,20 @@ public class MovesGameActivity extends Activity {
 
         //settings
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int totalMoves = 30;
-        int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
-        int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
+        difficulty = prefs.getString("difficulty", Difficulty.MIDDLE.toString());
+        if (difficulty.equals(Difficulty.EASY.toString())){
+            pitchSize = 7;
+            numberColors = 3;
+        } else if (difficulty.equals(Difficulty.MIDDLE.toString())){
+            pitchSize = 6;
+            numberColors = 4;
+        } else if (difficulty.equals(Difficulty.HARD.toString())){
+            pitchSize = 5;
+            numberColors = 5;
+        }
+        //int totalMoves = 30;
+        //int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
+        //int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
 
         //get views
         gameView = (GameView) findViewById(R.id.gameView);
@@ -55,7 +73,7 @@ public class MovesGameActivity extends Activity {
 
         //init logic with basic settings
         logic = new LimitedMovesLogic(
-                totalMoves,
+                TOTAL_MOVES,
                 pitchSize,
                 numberColors
         );
@@ -104,9 +122,9 @@ public class MovesGameActivity extends Activity {
         gameView.invalidate();
 
         //set texts
-        remainingMovesView.setText(getResources().getString(R.string.remainingMoves, totalMoves));
+        remainingMovesView.setText(getResources().getString(R.string.remainingMoves, TOTAL_MOVES));
         scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore"+logic.getMode(), 0)));
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
     }
 
     @Override
@@ -135,7 +153,7 @@ public class MovesGameActivity extends Activity {
         Intent intent = new Intent(this, GameFinishedActivity.class);
         intent.putExtra("gameType", logic.getMode());
         intent.putExtra("score", scoreManager.getScore());
-        intent.putExtra("highScore", prefs.getInt("highscore"+logic.getMode(),0));
+        intent.putExtra("highScore", prefs.getInt("highscore" + logic.getMode() + difficulty,0));
         startActivity(intent);
         this.finish();
     }

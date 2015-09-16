@@ -39,4 +39,10 @@
         <item name="android:background">@drawable/button_settings</item>
     </style>
 
+    <style name="gameText" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/game_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily"></item>
+    </style>
+
 </resources>
