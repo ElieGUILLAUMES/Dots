@@ -17,7 +17,7 @@
 
     <!-- Game Finisehed -->
     <dimen name="game_finished_text_size">24sp</dimen>
-    <dimen name="game_finished_score_size">56sp</dimen>
+    <dimen name="game_finished_score_size">48sp</dimen>
     <dimen name="vertical_space_between_part">32dp</dimen>
 
     <!-- High Scores -->

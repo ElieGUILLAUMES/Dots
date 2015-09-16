@@ -29,6 +29,7 @@
     <string name="replay">Replay</string>
     <string name="menu">Menu</string>
     <string name="title_activity_high_scores">HighScoresActivity</string>
+    <string name="new_highscore">New HighScore !</string>
 
     <!-- High Scores -->
     <string name="highScoreReset">Reset</string>
