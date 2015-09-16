@@ -68,6 +68,9 @@ public abstract class AbstractLogic implements ILogic {
         shiftDown(affectedColumns);
         createDots(affectedColumns);
 
+        //shuffle until a move is doable
+        while(checkAndShuffle());
+
         //notify trace finished
         notifyTraceFinished(trace);
     }
@@ -268,9 +271,43 @@ public abstract class AbstractLogic implements ILogic {
     /**
      * Check if there is no move left, and shuffle the points in this situation,
      * until there is a possible move.
+     *
+     * @return true, if it was shuffled
      */
-    protected void checkAndShuffle() {
-        //TODO
+    protected boolean checkAndShuffle() {
+
+        //check if a move is possible
+        for(int row=0; row<pitchSize; row++) {
+            for(int column=0; column<pitchSize; column++) {
+                DotColor color = getDot(row, column).getColor();
+
+                //check bottom
+                if(row+1 < pitchSize && color == getDot(row+1, column).getColor()) {
+                    return false;
+                }
+
+                //check right
+                if(column+1 < pitchSize && color == getDot(row, column+1).getColor()) {
+                    return false;
+                }
+            }
+        }
+
+        //no move possible --> shuffle
+        //not a real shuffle, clear all and create them
+
+        //remove all dots
+        for(int row=0; row<pitchSize; row++) {
+            for(int column=0; column<pitchSize; column++) {
+                removeDot(new Position<Integer>(row, column));
+            }
+        }
+        //create all dots
+        for(int column = 0; column < pitchSize; column++) {
+            createDots(column);
+        }
+
+        return true;
     }
 
     @Override

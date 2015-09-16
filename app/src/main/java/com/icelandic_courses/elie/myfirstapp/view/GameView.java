@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -20,6 +22,8 @@ import com.icelandic_courses.elie.myfirstapp.animation.IAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.animation.LinearAnimationLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverter;
 import com.icelandic_courses.elie.myfirstapp.transformation.PixelToPitchConverterDescription;
@@ -37,6 +41,7 @@ public class GameView extends View {
     private final static String TAG = GameView.class.getSimpleName();
 
     private final Timer timer;
+    private final ToneGenerator toneGenerator;
 
     private ILogic logic;
     private IAnimationLogic animationLogic;
@@ -62,6 +67,9 @@ public class GameView extends View {
         m_paintLine.setStyle(Paint.Style.STROKE);
         m_paintLine.setStrokeJoin(Paint.Join.ROUND);
         m_paintLine.setAntiAlias(true);
+
+        //tone generator
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
 
         //auto invalidate every 30 milliseconds
         timer = new Timer();
@@ -90,12 +98,30 @@ public class GameView extends View {
 
         //tracking handler
         traceHandler = new TraceHandler(logic, converter);
+        traceHandler.registerTraceChangeHandler(new TraceChangeHandler() {
+            @Override
+            public void onTraceChanged(Trace trace) {
+                doTraceFeedback(trace);
+            }
+
+            @Override
+            public void onLastTrackingPointChanged(Position<Float> lastTrackingPoint) {
+
+            }
+        });
 
         //animation logic
         animationLogic = new BounceAnimationLogic(logic, converter, traceHandler);
 
         //set cell size, because the pitch size wasn't clear before
         setCellSize();
+    }
+
+    private void doTraceFeedback(Trace trace) {
+        //TODO visualization
+
+        //play tone
+        toneGenerator.startTone(trace.getPositions().size(), 100);
     }
 
     @Override
