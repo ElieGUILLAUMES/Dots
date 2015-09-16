@@ -68,8 +68,6 @@ public class ClassicGameActivity extends Activity {
             pitchSize = 5;
             numberColors = 5;
         }
-        //int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
-        //int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
 
         setContentView(R.layout.activity_classic_game);
         gameView = (GameView) findViewById(R.id.gameView);

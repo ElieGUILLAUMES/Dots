@@ -1,6 +1,7 @@
 package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -13,12 +14,13 @@ public class MyActivity extends Activity {
 
 
     public final static String EXTRA_MESSAGE = "com.icelandic_courses.elie.myfirstapp.MESSAGE";
-
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = this;
     }
 
 
@@ -63,5 +65,9 @@ public class MyActivity extends Activity {
     public void settings(View view){
         Intent intent = new Intent(this, PreferenceActivity.class);
         startActivity(intent);
+    }
+
+    public static Context getContext(){
+        return context;
     }
 }
