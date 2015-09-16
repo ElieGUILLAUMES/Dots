@@ -55,7 +55,11 @@ public class Trace {
             return;
         }
         Position<Integer> lastPosition = getLastPosition();
-        positions.remove(lastPosition);
+        positions.remove(positions.lastIndexOf(lastPosition));
+
+        //the set has to be renewed, because possible duplicates in the trace
+        positionSet.clear();
+        positionSet.addAll(positions);
 
         //remove segment
         if(positions.size() == 0) {

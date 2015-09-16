@@ -129,31 +129,38 @@ public class TraceHandler {
             if(closestDistanceToSegment <= minDistance) {
 
                 //check for segment duplicates
-                if(trace.getSegments().contains(new Segment(referencePoint, potentialPoint))) {
+                Segment potentialSegment = new Segment(referencePoint, potentialPoint);
+                if(trace.getSegments().contains(potentialSegment)) {
 
-                    //the segment is already in use, this point is not usable
-                    continue;
-
-                    //TODO go back
-                    /*//check, if the user wants to go back
-                    if(referencePoint.equals(trace.getLastPosition())) {
+                    //check, if the user wants to go back
+                    Position<Integer> lastTracePoint = trace.getLastPosition();
+                    if(referencePoint.equals(lastTracePoint)) {
                         //go back: remove latest point
-                        trace.removeLastPosition();
+                        removeLastTracePoint();
                         break;
                     }
                     else {
                         //the segment is already in use, this point is not usable
-                        continue;
-                    }*/
+                        break;
+                    }
                 }
 
                 //found the next trace point and update the next potential points
                 addTracePoint(potentialPoint);
-                potentialPoints = getPotentialNeighbors(potentialPoint);
-                captureNextTracePoints(potentialPoint, potentialPoints, segmentStart, segmentEnd);
+                Collection<Position<Integer>> nextPotentialPoints = getPotentialNeighbors(potentialPoint);
+                nextPotentialPoints.remove(referencePoint);
+                captureNextTracePoints(potentialPoint, nextPotentialPoints, segmentStart, segmentEnd);
                 break;
             }
         }
+    }
+
+    private void removeLastTracePoint() {
+        //remove it
+        trace.removeLastPosition();
+
+        //notify handlers
+        notifyTraceChanged();
     }
 
     private void addTracePoint(Position<Integer> point) {
