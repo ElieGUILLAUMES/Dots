@@ -9,6 +9,35 @@
     android:gravity="center">
 
     <LinearLayout
+        android:id="@+id/newHighScoreLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/newHighScoreText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/new_highscore"
+            android:gravity="center"
+            android:textSize="@dimen/game_finished_text_size"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/newHighScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/game_finished_score_size"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/vertical_space_between_part"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/scoreLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -100,6 +129,5 @@
             android:layout_marginLeft="@dimen/horizontal_space_between_menu_buttons"/>
 
     </LinearLayout>
-
 
 </LinearLayout>

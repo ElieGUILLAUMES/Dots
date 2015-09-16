@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
@@ -23,11 +24,21 @@ public class GameFinishedActivity extends Activity {
 
         intent = getIntent();
 
-        TextView scoreView = (TextView) findViewById(R.id.score);
-        scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+        // If it is a new High Score
+        if(intent.getIntExtra("score",0) > intent.getIntExtra("highScore",0)){
+            TextView highScoreView = (TextView) findViewById(R.id.newHighScore);
+            highScoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+            LinearLayout newHighScoreLayout = (LinearLayout) findViewById(R.id.newHighScoreLayout);
+            newHighScoreLayout.setVisibility(View.VISIBLE);
+            LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreLayout);
+            scoreLayout.setVisibility(View.GONE);
+        } else {
+            TextView scoreView = (TextView) findViewById(R.id.score);
+            scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+            TextView highScoreView = (TextView) findViewById(R.id.highScore);
+            highScoreView.setText(String.valueOf(intent.getIntExtra("highScore", 0)));
+        }
 
-        TextView highScoreView = (TextView) findViewById(R.id.highScore);
-        highScoreView.setText(String.valueOf(intent.getIntExtra("highScore", 0)));
 
     }
 
