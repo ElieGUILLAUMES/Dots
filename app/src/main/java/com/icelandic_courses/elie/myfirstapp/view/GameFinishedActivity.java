@@ -2,6 +2,8 @@ package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,9 +15,12 @@ import android.widget.TextView;
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 
+import java.io.IOException;
+
 public class GameFinishedActivity extends Activity {
 
     private Intent intent;
+    private MediaPlayer mp = new MediaPlayer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +37,20 @@ public class GameFinishedActivity extends Activity {
             newHighScoreLayout.setVisibility(View.VISIBLE);
             LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreLayout);
             scoreLayout.setVisibility(View.GONE);
+
+            try {
+                mp.reset();
+                AssetFileDescriptor afd;
+                afd = getAssets().openFd("applause.mp3");
+                mp.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+                mp.prepare();
+                mp.start();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         } else {
             TextView scoreView = (TextView) findViewById(R.id.score);
             scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
@@ -76,11 +95,15 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void menu(View view){
-        this.finish();
+        onBackPressed();
     }
 
     @Override
     public void onBackPressed() {
+        if(mp.isPlaying())
+        {
+            mp.stop();
+        }
         this.finish();
     }
 }
