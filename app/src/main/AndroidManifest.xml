@@ -42,6 +42,10 @@
             android:name=".view.GameFinishedActivity"
             android:label="@string/title_activity_game_finished" >
         </activity>
+        <activity
+            android:name=".view.HighScoresActivity"
+            android:label="@string/title_activity_high_scores" >
+        </activity>
     </application>
 
 </manifest>

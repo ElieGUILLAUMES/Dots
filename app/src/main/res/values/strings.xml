@@ -28,5 +28,9 @@
     <string name="game_finished_hishScoreText">HighScore</string>
     <string name="replay">Replay</string>
     <string name="menu">Menu</string>
+    <string name="title_activity_high_scores">HighScoresActivity</string>
+
+    <!-- High Scores -->
+    <string name="highScoreReset">Reset</string>
 
 </resources>

@@ -1,0 +1,51 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/remainingSeconds"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="@string/remainingSeconds"
+        android:gravity="center"
+        android:textSize="@dimen/game_text_size" />
+
+    <com.icelandic_courses.elie.myfirstapp.view.GameView
+        android:id="@+id/gameView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_toRightOf="@+id/remainingSeconds"/>
+
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_toRightOf="@+id/gameView"
+        android:gravity="center">
+
+            <TextView
+                android:id="@+id/score"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="@string/score"
+                android:layout_weight="1"
+                android:gravity="center_horizontal|bottom"
+                android:textSize="@dimen/game_text_size"/>
+
+            <TextView
+                android:id="@+id/bestScore"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:text="@string/best_score"
+                android:gravity="center_horizontal|top"
+                android:textSize="@dimen/game_text_size"
+                android:layout_weight="1" />
+
+    </LinearLayout>
+
+</RelativeLayout>

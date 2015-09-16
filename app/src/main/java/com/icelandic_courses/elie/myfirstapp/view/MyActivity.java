@@ -56,7 +56,8 @@ public class MyActivity extends Activity {
     }
 
     public void highScore(View view){
-
+        Intent intent = new Intent(this, HighScoresActivity.class);
+        startActivity(intent);
     }
 
     public void settings(View view){
