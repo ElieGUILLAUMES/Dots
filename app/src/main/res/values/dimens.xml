@@ -24,6 +24,5 @@
     <dimen name="high_scores_title_size">32sp</dimen>
     <dimen name="high_scores_text_size">24sp</dimen>
     <dimen name="high_scores_row_text_size">16sp</dimen>
-    <dimen name="vertical_space_between_tile_and_score">32dp</dimen>
 
 </resources>

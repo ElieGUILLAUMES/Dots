@@ -1,13 +1,14 @@
 package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -44,6 +45,8 @@ public class GameView extends View {
     private final Timer timer;
     private final ToneGenerator toneGenerator;
 
+    private SharedPreferences prefs;
+
     private ILogic logic;
     private IAnimationLogic animationLogic;
     private TraceHandler traceHandler;
@@ -68,6 +71,8 @@ public class GameView extends View {
         m_paintLine.setStyle(Paint.Style.STROKE);
         m_paintLine.setStrokeJoin(Paint.Join.ROUND);
         m_paintLine.setAntiAlias(true);
+
+        prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
         //tone generator
         toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
@@ -122,7 +127,10 @@ public class GameView extends View {
         //TODO visualization
 
         //play tone
-        toneGenerator.startTone(trace.getPositions().size(), 100);
+        if(!prefs.getBoolean("silence", false)){
+            toneGenerator.startTone(trace.getPositions().size(), 100);
+        }
+
     }
 
     @Override
@@ -275,4 +283,5 @@ public class GameView extends View {
 
         return super.onTouchEvent(event);
     }
+
 }

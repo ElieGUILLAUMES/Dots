@@ -2,7 +2,11 @@ package com.icelandic_courses.elie.myfirstapp.view;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,9 +17,13 @@ import android.widget.TextView;
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 
+import java.io.IOException;
+
 public class GameFinishedActivity extends Activity {
 
     private Intent intent;
+    private MediaPlayer mp = new MediaPlayer();
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +31,8 @@ public class GameFinishedActivity extends Activity {
         setContentView(R.layout.activity_game_finished);
 
         intent = getIntent();
+
+        prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
         // If it is a new High Score
         if(intent.getIntExtra("score",0) > intent.getIntExtra("highScore",0)){
@@ -32,6 +42,22 @@ public class GameFinishedActivity extends Activity {
             newHighScoreLayout.setVisibility(View.VISIBLE);
             LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreLayout);
             scoreLayout.setVisibility(View.GONE);
+
+            if(!prefs.getBoolean("silence", false)){
+                try {
+                    mp.reset();
+                    AssetFileDescriptor afd;
+                    afd = getAssets().openFd("applause.mp3");
+                    mp.setDataSource(afd.getFileDescriptor(),afd.getStartOffset(),afd.getLength());
+                    mp.prepare();
+                    mp.start();
+                } catch (IllegalStateException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         } else {
             TextView scoreView = (TextView) findViewById(R.id.score);
             scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
@@ -76,11 +102,15 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void menu(View view){
-        this.finish();
+        onBackPressed();
     }
 
     @Override
     public void onBackPressed() {
+        if(mp.isPlaying())
+        {
+            mp.stop();
+        }
         this.finish();
     }
 }

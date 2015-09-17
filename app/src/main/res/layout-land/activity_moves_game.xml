@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:text="@string/remainingMoves"
         android:gravity="center"
-        android:textSize="@dimen/game_text_size"/>
+        style="@style/gameText"/>
 
     <com.icelandic_courses.elie.myfirstapp.view.GameView
         android:id="@+id/gameView"
@@ -35,7 +35,7 @@
             android:text="@string/score"
             android:layout_weight="1"
             android:gravity="center_horizontal|bottom"
-            android:textSize="@dimen/game_text_size"/>
+            style="@style/gameText"/>
 
         <TextView
             android:id="@+id/bestScore"
@@ -43,7 +43,7 @@
             android:layout_height="0dp"
             android:text="@string/best_score"
             android:gravity="center_horizontal|top"
-            android:textSize="@dimen/game_text_size"
+            style="@style/gameText"
             android:layout_weight="1"/>
 
     </LinearLayout>

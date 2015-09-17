@@ -11,18 +11,11 @@
         android:summary="If this option is selected, the phone vibrate after each move done"
         android:key="vibration" />
 
-    <ListPreference android:title="Color number"
-        android:defaultValue="3"
-        android:summary="Number of dots' color. The higher it is, the more difficult is the game"
-        android:key="numberColor"
-        android:entries="@array/listColorNumberDescriptionArray"
-        android:entryValues="@array/listColorNumberArray"/>
-
-    <ListPreference android:title="Pitch's Size"
-        android:defaultValue="6"
-        android:summary="Number of rows and columns of the pitch"
-        android:key="pitchSize"
-        android:entries="@array/listSizeDescriptionArray"
-        android:entryValues="@array/listSizeNumberArray"/>
+    <ListPreference android:title="Difficulty"
+        android:defaultValue="middle"
+        android:summary="Number of rows/columns of the pitch and of the colors of the dots"
+        android:key="difficulty"
+        android:entries="@array/difficultiesArray"
+        android:entryValues="@array/difficultiesValuesArray"/>
 
 </PreferenceScreen>

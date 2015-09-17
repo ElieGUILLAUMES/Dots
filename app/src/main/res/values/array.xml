@@ -1,28 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="listColorNumberDescriptionArray">
-        <item>2 colors (Easy)</item>
-        <item>3 colors (Normal)</item>
-        <item>4 colors (Hard)</item>
+    <string-array name="difficultiesArray">
+        <item><b>Easy:</b>\n7 rows and columns\n3 colors of dots</item>
+        <item><b>Middle:</b>\n6 rows and columns\n4 colors of dots</item>
+        <item><b>Hard:</b>\n5 rows and columns\n5 colors of dots</item>
     </string-array>
 
-    <string-array name="listColorNumberArray">
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-
-    <string-array name="listSizeDescriptionArray">
-        <item>5 rows and columns (Small)</item>
-        <item>6 rows and columns (Average)</item>
-        <item>8 rows and columns (Big)</item>
-    </string-array>
-
-    <string-array name="listSizeNumberArray">
-        <item>5</item>
-        <item>6</item>
-        <item>8</item>
+    <string-array name="difficultiesValuesArray">
+        <item>easy</item>
+        <item>middle</item>
+        <item>hard</item>
     </string-array>
 
 </resources>

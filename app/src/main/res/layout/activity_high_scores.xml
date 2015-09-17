@@ -14,15 +14,15 @@
         android:text="@string/highScore"
         android:textStyle="bold"
         android:textSize="@dimen/high_scores_title_size"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/vertical_space_between_tile_and_score"/>
+        android:gravity="center"/>
 
     <ListView
         android:id="@+id/highScores"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
-        android:padding="16dp">
+        android:padding="8dp"
+        android:layout_above="@+id/resetButton">
     </ListView>
 
     <Button

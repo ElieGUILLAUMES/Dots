@@ -17,10 +17,10 @@
     <string name="title_activity_preference">PreferenceActivity</string>
 
     <!-- Game -->
-    <string name="remainingMoves"><b>Moves left :</b> %1$d</string>
-    <string name="remainingSeconds"><b>Seconds left :</b> %1$d</string>
-    <string name="score"><b>Score :</b> %1$d</string>
-    <string name="best_score"><b>Best Score :</b> %1$d</string>
+    <string name="remainingMoves">Moves left : %1$d</string>
+    <string name="remainingSeconds">Seconds left : %1$d</string>
+    <string name="score">Score : %1$d</string>
+    <string name="best_score">Best Score : %1$d</string>
     <string name="title_activity_game_finished">GameFinished</string>
 
     <!-- Game Finished -->
