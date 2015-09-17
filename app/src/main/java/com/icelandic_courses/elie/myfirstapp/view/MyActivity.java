@@ -3,6 +3,7 @@ package com.icelandic_courses.elie.myfirstapp.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,11 +50,13 @@ public class MyActivity extends Activity {
 
     public void launchClassicGame(View view){
         Intent intent = new Intent(this, ClassicGameActivity.class);
+        intent.putExtra("orientation", getResources().getConfiguration().orientation);
         startActivity(intent);
     }
 
     public void launchMovesGame(View view){
         Intent intent = new Intent(this, MovesGameActivity.class);
+        intent.putExtra("orientation", getResources().getConfiguration().orientation);
         startActivity(intent);
     }
 
