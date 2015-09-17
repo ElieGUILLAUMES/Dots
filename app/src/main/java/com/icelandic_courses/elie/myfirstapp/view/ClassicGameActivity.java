@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
