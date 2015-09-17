@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 
 import android.util.Log;
@@ -274,5 +275,4 @@ public class GameView extends View {
 
         return super.onTouchEvent(event);
     }
-
 }
