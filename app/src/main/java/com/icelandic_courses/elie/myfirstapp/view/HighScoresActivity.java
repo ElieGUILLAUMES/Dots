@@ -40,6 +40,11 @@ public class HighScoresActivity extends Activity {
     private Spinner gameModeSpinner;
 
     private TextView title;
+    private TextView noHighScore;
+
+    private TextView difficultySpinnerTitle;
+    private TextView gameModeSpinnerTitle;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +52,9 @@ public class HighScoresActivity extends Activity {
         setContentView(R.layout.activity_high_scores);
 
         title = (TextView) findViewById(R.id.title);
+        noHighScore = (TextView) findViewById(R.id.noHighScore);
+        gameModeSpinnerTitle = (TextView) findViewById(R.id.gameModeTitle);
+        difficultySpinnerTitle = (TextView) findViewById(R.id.difficultyTitle);
 
         highScoreListView = (ListView) findViewById(R.id.highScores);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -68,8 +76,8 @@ public class HighScoresActivity extends Activity {
         Difficulty difficulty = Difficulty.get(preferences);
         difficultySpinner.setSelection( difficulty == Difficulty.EASY ? 0 : difficulty ==Difficulty.HARD ? 2 : 1);
 
-        difficultySpinner.setBackgroundColor(Color.WHITE);
-        gameModeSpinner.setBackgroundColor(Color.WHITE);
+        difficultySpinner.setBackgroundColor(getResources().getColor(R.color.blue));
+        gameModeSpinner.setBackgroundColor(getResources().getColor(R.color.green));
 
         //on item select listener
         AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
@@ -92,6 +100,12 @@ public class HighScoresActivity extends Activity {
         checkNightMode();
     }
 
+    @Override
+    protected void onResume() {
+        checkNightMode();
+        super.onResume();
+    }
+
     private void createHighScoreList() {
         //get difficulty
         Difficulty difficulty;
@@ -112,8 +126,16 @@ public class HighScoresActivity extends Activity {
         scoreList.clear();
         List<Integer> scores = HighScoreManager.getList(preferences, gameMode, difficulty);
         scoreList.addAll(scores);
-        listAdapter.notifyDataSetChanged();
+        if(scores.isEmpty()){
+            highScoreListView.setVisibility(View.GONE);
+            noHighScore.setVisibility(View.VISIBLE);
+        } else {
+            highScoreListView.setVisibility(View.VISIBLE);
+            noHighScore.setVisibility(View.GONE);
+        }
         checkNightMode();
+        listAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -179,16 +201,15 @@ public class HighScoresActivity extends Activity {
             this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
             title.setTextColor(Color.WHITE);
             highScoreListView.setBackgroundColor(Color.WHITE);
-            /*
-            for(int i=0; i<difficultySpinner.getChildCount(); i++){
-                ((TextView) difficultySpinner.getChildAt(i)).setTextColor(Color.WHITE);
-            }
-            for(int i=0; i<gameModeSpinner.getChildCount(); i++){
-                ((TextView) gameModeSpinner.getChildAt(i)).setTextColor(Color.WHITE);
-            }
-            */
+            noHighScore.setTextColor(Color.WHITE);
+            gameModeSpinnerTitle.setTextColor(Color.WHITE);
+            difficultySpinnerTitle.setTextColor(Color.WHITE);
         } else {
             this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
+            title.setTextColor(Color.BLACK);
+            noHighScore.setTextColor(Color.BLACK);
+            gameModeSpinnerTitle.setTextColor(Color.BLACK);
+            difficultySpinnerTitle.setTextColor(Color.BLACK);
         }
     }
 }

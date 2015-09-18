@@ -25,5 +25,7 @@
     <dimen name="high_scores_title_size">32sp</dimen>
     <dimen name="high_scores_text_size">24sp</dimen>
     <dimen name="high_scores_row_text_size">16sp</dimen>
+    <dimen name="no_high_score_text_size">24sp</dimen>
+    <dimen name="high_scores_spinner_title_size">16sp</dimen>
 
 </resources>

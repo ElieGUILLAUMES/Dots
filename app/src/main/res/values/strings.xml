@@ -35,5 +35,8 @@
     <!-- High Scores -->
     <string name="highScoreReset">Reset</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="no_high_score">No High Score</string>
+    <string name="mode">Mode</string>
+    <string name="difficulty">Difficulty</string>
 
 </resources>

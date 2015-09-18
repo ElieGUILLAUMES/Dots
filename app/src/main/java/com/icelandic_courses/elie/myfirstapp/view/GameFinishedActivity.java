@@ -90,6 +90,12 @@ public class GameFinishedActivity extends Activity {
     }
 
     @Override
+    protected void onResume() {
+        checkNightMode();
+        super.onResume();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_game_finished, menu);
@@ -105,6 +111,8 @@ public class GameFinishedActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, PreferenceActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -146,6 +154,12 @@ public class GameFinishedActivity extends Activity {
             highScoreTitle.setTextColor(Color.WHITE);
         } else {
             this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
+            newHighScore.setTextColor(Color.BLACK);
+            newHighScoreTitle.setTextColor(Color.BLACK);
+            score.setTextColor(Color.BLACK);
+            scoreTitle.setTextColor(Color.BLACK);
+            highScore.setTextColor(Color.BLACK);
+            highScoreTitle.setTextColor(Color.BLACK);
 
         }
     }
