@@ -67,8 +67,8 @@ public class LimitedMovesLogic extends AbstractLogic {
     }
 
     @Override
-    public String getMode() {
-        return GameMode.MOVES.toString();
+    public GameMode getMode() {
+        return GameMode.MOVES;
     }
 
 }

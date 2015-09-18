@@ -9,7 +9,7 @@ import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 public interface ILogic {
 
     //mode
-    public String getMode();
+    public GameMode getMode();
 
     //game flow
     public void start();

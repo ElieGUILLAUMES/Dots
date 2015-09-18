@@ -397,5 +397,5 @@ public abstract class AbstractLogic implements ILogic {
     }
 
     @Override
-    public abstract String getMode();
+    public abstract GameMode getMode();
 }

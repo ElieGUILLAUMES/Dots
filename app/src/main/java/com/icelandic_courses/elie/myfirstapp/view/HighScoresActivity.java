@@ -12,29 +12,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
 import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
-import com.icelandic_courses.elie.myfirstapp.logic.time.TimedLogic;
-import com.icelandic_courses.elie.myfirstapp.score.HighScore;
+import com.icelandic_courses.elie.myfirstapp.score.HighScoreManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class HighScoresActivity extends Activity {
 
     private ListView highScoreListView;
-    private ArrayList<HighScore> highScores = new ArrayList<HighScore>();
-    private HighScoreAdapter highScoreAdapter;
+    private List<Integer> scoreList;
+    private ArrayAdapter<Integer> listAdapter;
 
-    private SharedPreferences prefs;
+
+    private SharedPreferences preferences;
+
+    private Spinner difficultySpinner;
+    private Spinner gameModeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +44,65 @@ public class HighScoresActivity extends Activity {
         setContentView(R.layout.activity_high_scores);
 
         highScoreListView = (ListView) findViewById(R.id.highScores);
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        //init array adapter
+        scoreList = new ArrayList<>();
+        listAdapter = new ArrayAdapter<Integer>(
+                this,
+                android.R.layout.simple_list_item_1,
+                android.R.id.text1,
+                scoreList);
+        highScoreListView.setAdapter(listAdapter);
+
+        //get views
+        difficultySpinner = (Spinner) findViewById(R.id.difficulty);
+        gameModeSpinner = (Spinner) findViewById(R.id.gameMode);
+
+        //set current difficulty
+        Difficulty difficulty = Difficulty.get(preferences);
+        difficultySpinner.setSelection( difficulty == Difficulty.EASY ? 0 : difficulty ==Difficulty.HARD ? 2 : 1);
+
+        //on item select listener
+        AdapterView.OnItemSelectedListener onItemSelectedListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                createHighScoreList();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
+        difficultySpinner.setOnItemSelectedListener(onItemSelectedListener);
+        gameModeSpinner.setOnItemSelectedListener(onItemSelectedListener);
+
+        //init with values
         createHighScoreList();
+    }
 
-        highScoreAdapter = new HighScoreAdapter(this, highScores);
-        highScoreListView.setAdapter(highScoreAdapter);
+    private void createHighScoreList() {
+        //get difficulty
+        Difficulty difficulty;
+        switch ((int) difficultySpinner.getSelectedItemId()) {
+            case 0: difficulty = Difficulty.EASY; break;
+            case 2: difficulty = Difficulty.HARD; break;
+            case 1:default: difficulty = Difficulty.MIDDLE;
+        }
+
+        //get game mode
+        GameMode gameMode;
+        switch ((int) gameModeSpinner.getSelectedItemId()) {
+            case 1: gameMode = GameMode.MOVES; break;
+            case 0:default: gameMode = GameMode.CLASSIC;
+        }
+
+        //update score list
+        scoreList.clear();
+        List<Integer> scores = HighScoreManager.getList(preferences, gameMode, difficulty);
+        scoreList.addAll(scores);
+        listAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -72,33 +127,6 @@ public class HighScoresActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class HighScoreAdapter extends ArrayAdapter<HighScore> {
-
-        private final Context context;
-        private final List<HighScore> values;
-
-        public HighScoreAdapter(Context context, List<HighScore> objects) {
-            super(context, -1, objects);
-            this.context = context;
-            this.values = objects;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent){
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View rowView = inflater.inflate(R.layout.high_scores_row, parent, false);
-
-            TextView gameModeView = (TextView) rowView.findViewById(R.id.gameMode);
-            gameModeView.setText(values.get(position).getGameMode());
-
-            TextView gameScoreView = (TextView) rowView.findViewById(R.id.gameScore);
-            gameScoreView.setText(String.valueOf(values.get(position).getHighScore()));
-
-            return rowView;
-        }
-    }
-
     @Override
     public void onBackPressed() {
         this.finish();
@@ -106,26 +134,13 @@ public class HighScoresActivity extends Activity {
     }
 
     private void resetHighScores(){
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.EASY.toString(), 0);
-        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.MIDDLE.toString(), 0);
-        editor.putInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.HARD.toString(), 0);
-        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.EASY.toString(), 0);
-        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.MIDDLE.toString(), 0);
-        editor.putInt("highscore" + GameMode.MOVES.toString() + Difficulty.HARD.toString(), 0);
-        editor.commit();
-        createHighScoreList();
-        highScoreAdapter.notifyDataSetChanged();
-    }
-
-    private void createHighScoreList(){
-        highScores.clear();
-        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.EASY.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.EASY.toString(), 0)));
-        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.MIDDLE.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.MIDDLE.toString(), 0)));
-        highScores.add(new HighScore(GameMode.CLASSIC.toString() + " " + Difficulty.HARD.toString(), prefs.getInt("highscore" + GameMode.CLASSIC.toString() + Difficulty.HARD.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.EASY.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.EASY.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.MIDDLE.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.MIDDLE.toString(), 0)));
-        highScores.add(new HighScore(GameMode.MOVES.toString() + " " + Difficulty.HARD.toString(), prefs.getInt("highscore" + GameMode.MOVES.toString() + Difficulty.HARD.toString(), 0)));
+        HighScoreManager.resetHighScore(preferences, GameMode.CLASSIC, Difficulty.EASY);
+        HighScoreManager.resetHighScore(preferences, GameMode.CLASSIC, Difficulty.MIDDLE);
+        HighScoreManager.resetHighScore(preferences, GameMode.CLASSIC, Difficulty.HARD);
+        HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.EASY);
+        HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.MIDDLE);
+        HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.HARD);
+        listAdapter.notifyDataSetChanged();
     }
 
     public void alertBeforeDeleteHighScores(View view){

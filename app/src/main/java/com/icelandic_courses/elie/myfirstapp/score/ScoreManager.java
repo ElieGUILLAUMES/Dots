@@ -1,8 +1,11 @@
 package com.icelandic_courses.elie.myfirstapp.score;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
+import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
 import com.icelandic_courses.elie.myfirstapp.logic.GameState;
 import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
@@ -48,11 +51,11 @@ public class ScoreManager {
             @Override
             public void gameStateChanged(GameState gameState, ILogic logic) {
                 if(gameState == GameState.FINISHED) {
-                    if(preferences.getInt("highscore" + logic.getMode() + preferences.getString("difficulty", "middle"), 0) < score.get()){
-                        SharedPreferences.Editor editor = preferences.edit();
-                        editor.putInt("highscore" + logic.getMode() + preferences.getString("difficulty", "middle"), score.get());
-                        editor.commit();
-                    };
+                    GameMode gameMode = logic.getMode();
+                    Difficulty difficulty = Difficulty.get(preferences);
+                    HighScoreManager.add(score.get(), preferences, gameMode, difficulty);
+
+                    Log.i("HighScores", HighScoreManager.getList(preferences, gameMode, difficulty).toString());
                 }
             }
         });
@@ -84,7 +87,7 @@ public class ScoreManager {
 
     public static int getAdditionalScore(Trace trace) {
         int traceLength = trace.getPositions().size();
-        int additionalScore = traceLength * (1 + trace.getNumberCircles());
+        int additionalScore = traceLength * (1 + trace.getNumberCircles() / 2);
         return additionalScore;
     }
 }

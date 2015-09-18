@@ -15,7 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
+import com.icelandic_courses.elie.myfirstapp.score.HighScoreManager;
 
 import java.io.IOException;
 
@@ -35,9 +37,14 @@ public class GameFinishedActivity extends Activity {
         prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
         // If it is a new High Score
-        if(intent.getIntExtra("score",0) > intent.getIntExtra("highScore",0)){
+        Difficulty difficulty = Difficulty.get(prefs);
+        GameMode gameMode = (GameMode) intent.getSerializableExtra("gameMode");
+        int score = intent.getIntExtra("score",0);
+        int highScore = HighScoreManager.getHighScore(prefs, gameMode, difficulty);
+
+        if(score > highScore){
             TextView highScoreView = (TextView) findViewById(R.id.newHighScore);
-            highScoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+            highScoreView.setText(String.valueOf(score));
             LinearLayout newHighScoreLayout = (LinearLayout) findViewById(R.id.newHighScoreLayout);
             newHighScoreLayout.setVisibility(View.VISIBLE);
             LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreLayout);
@@ -60,9 +67,9 @@ public class GameFinishedActivity extends Activity {
 
         } else {
             TextView scoreView = (TextView) findViewById(R.id.score);
-            scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+            scoreView.setText(String.valueOf(score));
             TextView highScoreView = (TextView) findViewById(R.id.highScore);
-            highScoreView.setText(String.valueOf(intent.getIntExtra("highScore", 0)));
+            highScoreView.setText(String.valueOf(highScore));
         }
 
 
@@ -91,7 +98,8 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void replay(View view){
-        if(intent.getStringExtra("gameType").equals(GameMode.CLASSIC.toString())){
+        GameMode gameMode = (GameMode) intent.getSerializableExtra("gameMode");
+        if(gameMode == GameMode.CLASSIC){
             Intent intent = new Intent(this, ClassicGameActivity.class);
             startActivity(intent);
         } else {

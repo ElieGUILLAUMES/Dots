@@ -13,4 +13,9 @@
         <item>hard</item>
     </string-array>
 
+    <string-array name="gameModes">
+        <item>Classic</item>
+        <item>Limited Moves</item>
+    </string-array>
+
 </resources>

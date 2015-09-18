@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -14,15 +14,38 @@
         android:text="@string/highScore"
         android:textStyle="bold"
         android:textSize="@dimen/high_scores_title_size"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:layout_margin="20dp"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/gameMode"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/gameModes"
+            >
+        </Spinner>
+
+        <Spinner
+            android:id="@+id/difficulty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:entries="@array/difficultiesValuesArray">
+        </Spinner>
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/highScores"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:padding="8dp"
-        android:layout_above="@+id/resetButton">
+        android:padding="8dp">
     </ListView>
 
     <Button
@@ -31,8 +54,6 @@
         android:layout_height="100dp"
         style="@style/highScoreButton"
         android:onClick="alertBeforeDeleteHighScores"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
         android:text="@string/highScoreReset"/>
 
-</RelativeLayout>
+</LinearLayout>

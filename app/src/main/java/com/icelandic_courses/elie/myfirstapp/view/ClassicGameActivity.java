@@ -5,13 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.PersistableBundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -23,29 +19,29 @@ import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.time.RemainingSecondsHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.time.TimedLogic;
+import com.icelandic_courses.elie.myfirstapp.score.HighScoreManager;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class ClassicGameActivity extends Activity {
 
     public final static String TAG = ClassicGameActivity.class.getSimpleName();
 
-    private final int SECONDS = 30;
+    private final int SECONDS = 3;
     private int pitchSize;
     private int numberColors;
 
-    private String difficulty;
+    private Difficulty difficulty;
 
     private GameView gameView;
     private TextView remainingSecondsView;
     private TextView scoreView;
     private TextView bestScoreView;
     private TextView addScoreView;
-    private SharedPreferences prefs;
+    private SharedPreferences preferences;
 
     private TimedLogic logic;
     private ScoreManager scoreManager;
@@ -65,19 +61,10 @@ public class ClassicGameActivity extends Activity {
         setContentView(R.layout.activity_moves_game);
 
         //settings
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        difficulty = prefs.getString("difficulty", Difficulty.MIDDLE.toString());
-        Log.i("Difficulty", " = " + difficulty);
-        if (difficulty.equals(Difficulty.EASY.toString())){
-            pitchSize = 7;
-            numberColors = 3;
-        } else if (difficulty.equals(Difficulty.MIDDLE.toString())){
-            pitchSize = 6;
-            numberColors = 4;
-        } else if (difficulty.equals(Difficulty.HARD.toString())){
-            pitchSize = 5;
-            numberColors = 5;
-        }
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        difficulty = Difficulty.get(preferences);
+        pitchSize = difficulty.getPitchSize();
+        numberColors = difficulty.getNumberColors();
 
         setContentView(R.layout.activity_classic_game);
         gameView = (GameView) findViewById(R.id.gameView);
@@ -98,10 +85,6 @@ public class ClassicGameActivity extends Activity {
                 numberColors
         );
 
-        //init best score and additional score
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
-        addScoreView.setText(getResources().getString(R.string.add_score, 0));
-
         //game state change handler
         logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
             @Override
@@ -121,13 +104,13 @@ public class ClassicGameActivity extends Activity {
             }
         });
 
-        scoreManager = new ScoreManager(logic, prefs);
+        scoreManager = new ScoreManager(logic, preferences);
         scoreManager.registerScoreChangeHandler(new ScoreChangeHandler() {
             @Override
             public void scoreChanged(int total, int additional) {
 
                 //vibration
-                if (prefs.getBoolean("vibration", false)) {
+                if (preferences.getBoolean("vibration", false)) {
                     vibe.vibrate(100);
                 }
 
@@ -163,7 +146,8 @@ public class ClassicGameActivity extends Activity {
         //set texts
         remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, SECONDS));
         scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
+        int highScore = HighScoreManager.getHighScore(preferences, logic.getMode(), difficulty);
+        bestScoreView.setText(getResources().getString(R.string.best_score, highScore));
         addScoreView.setText(getResources().getString(R.string.add_score, 0));
     }
 
@@ -191,9 +175,8 @@ public class ClassicGameActivity extends Activity {
 
     private void launchGameFinishedActivity(){
         Intent intent = new Intent(this, GameFinishedActivity.class);
-        intent.putExtra("gameType", logic.getMode());
+        intent.putExtra("gameMode", logic.getMode());
         intent.putExtra("score", scoreManager.getScore());
-        intent.putExtra("highScore", prefs.getInt("highscore" + logic.getMode() + difficulty,0));
         startActivity(intent);
         this.finish();
     }
