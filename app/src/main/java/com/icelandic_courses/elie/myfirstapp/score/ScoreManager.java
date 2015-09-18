@@ -87,7 +87,7 @@ public class ScoreManager {
 
     public static int getAdditionalScore(Trace trace) {
         int traceLength = trace.getPositions().size();
-        int additionalScore = traceLength * (1 + trace.getNumberCircles() / 2);
+        int additionalScore = (int) (traceLength * (1 + 0.5 * trace.getNumberCircles()));
         return additionalScore;
     }
 }
