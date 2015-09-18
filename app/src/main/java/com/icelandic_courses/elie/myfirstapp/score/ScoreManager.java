@@ -48,7 +48,7 @@ public class ScoreManager {
             @Override
             public void gameStateChanged(GameState gameState, ILogic logic) {
                 if(gameState == GameState.FINISHED) {
-                    if(preferences.getInt("highscore" + logic.getMode(), 0) < score.get()){
+                    if(preferences.getInt("highscore" + logic.getMode() + preferences.getString("difficulty", "middle"), 0) < score.get()){
                         SharedPreferences.Editor editor = preferences.edit();
                         editor.putInt("highscore" + logic.getMode() + preferences.getString("difficulty", "middle"), score.get());
                         editor.commit();
