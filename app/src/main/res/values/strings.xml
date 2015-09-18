@@ -17,11 +17,11 @@
     <string name="title_activity_preference">PreferenceActivity</string>
 
     <!-- Game -->
-    <string name="remainingMoves">Moves left : %1$d</string>
-    <string name="remainingSeconds">Seconds left : %1$d</string>
-    <string name="score">Score : %1$d</string>
-    <string name="add_score">Add Score : %1$d</string>
-    <string name="best_score">Best Score : %1$d</string>
+    <string name="remainingMoves">%1$d</string>
+    <string name="remainingSeconds">%1$d</string>
+    <string name="score">%1$d</string>
+    <string name="add_score">%1$d</string>
+    <string name="best_score">%1$d</string>
     <string name="title_activity_game_finished">GameFinished</string>
 
     <!-- Game Finished -->
@@ -34,5 +34,6 @@
 
     <!-- High Scores -->
     <string name="highScoreReset">Reset</string>
+    <string name="title_activity_splash">SplashActivity</string>
 
 </resources>

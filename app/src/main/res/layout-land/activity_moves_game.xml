@@ -12,23 +12,53 @@
         android:orientation="vertical"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/remainingMoves"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:text="@string/remainingSeconds"
-            android:gravity="center_horizontal|bottom"
-            style="@style/gameText"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/additionalScore"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/add_score"
-            android:gravity="center_horizontal|top"
-            style="@style/gameText"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|bottom">
+
+            <ImageView
+                android:id="@+id/remainingMovesIcon"
+                android:layout_width="@dimen/game_text_size"
+                android:layout_height="@dimen/game_text_size"
+                android:src="@drawable/moves"
+                android:layout_marginRight="@dimen/game_space_between_icon_and_text"/>
+
+            <TextView
+                android:id="@+id/remainingMoves"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/remainingMoves"
+                android:gravity="center"
+                style="@style/gameText"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|top">
+
+            <ImageView
+                android:id="@+id/additionalScoreIcon"
+                android:layout_width="@dimen/game_text_size"
+                android:layout_height="@dimen/game_text_size"
+                android:src="@drawable/score_add"
+                android:layout_marginRight="@dimen/game_space_between_icon_and_text"/>
+
+            <TextView
+                android:id="@+id/additionalScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/add_score"
+                android:gravity="center"
+                style="@style/gameText"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -40,30 +70,58 @@
         android:layout_toRightOf="@+id/leftSection"/>
 
     <LinearLayout
-        android:id="@+id/header"
+        android:id="@+id/rightSection"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_toRightOf="@+id/gameView"
         android:gravity="center">
 
-        <TextView
-            android:id="@+id/score"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/score"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center_horizontal|bottom"
-            style="@style/gameText"/>
+            android:orientation="horizontal"
+            android:gravity="center_horizontal|bottom">
 
-        <TextView
-            android:id="@+id/bestScore"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:text="@string/best_score"
-            android:gravity="center_horizontal|top"
-            style="@style/gameText"
-            android:layout_weight="1"/>
+            <ImageView
+                android:id="@+id/scoreIcon"
+                android:layout_width="@dimen/game_text_size"
+                android:layout_height="@dimen/game_text_size"
+                android:src="@drawable/score"
+                android:layout_marginRight="@dimen/game_space_between_icon_and_text"/>
+
+            <TextView
+                android:id="@+id/score"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/score"
+                style="@style/gameText"/>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal|top">
+
+            <ImageView
+                android:id="@+id/highScoreIcon"
+                android:layout_width="@dimen/game_text_size"
+                android:layout_height="@dimen/game_text_size"
+                android:src="@drawable/highscore"
+                android:layout_marginRight="@dimen/game_space_between_icon_and_text"/>
+
+            <TextView
+                android:id="@+id/bestScore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/best_score"
+                style="@style/gameText"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

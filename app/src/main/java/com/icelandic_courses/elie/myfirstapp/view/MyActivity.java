@@ -3,28 +3,42 @@ package com.icelandic_courses.elie.myfirstapp.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 
 public class MyActivity extends Activity {
 
-
     public final static String EXTRA_MESSAGE = "com.icelandic_courses.elie.myfirstapp.MESSAGE";
     private static Context context;
+    private SharedPreferences prefs;
+    private ImageView title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        title = (ImageView) findViewById(R.id.title);
         context = this;
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        checkNightMode();
     }
 
-
+    @Override
+    protected void onResume() {
+        checkNightMode();
+        super.onResume();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -42,6 +56,8 @@ public class MyActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, PreferenceActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -73,4 +89,18 @@ public class MyActivity extends Activity {
     public static Context getContext(){
         return context;
     }
+
+    private void checkNightMode(){
+        if(prefs.getBoolean("nightmode", false)){
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
+            title.setBackgroundColor(Color.BLACK);
+            title.setImageResource(R.drawable.title_night_mode);
+        } else {
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
+            ImageView title = (ImageView) findViewById(R.id.title);
+            title.setBackgroundColor(Color.WHITE);
+            title.setImageResource(R.drawable.title);
+        }
+    }
+
 }

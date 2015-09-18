@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
@@ -50,6 +52,11 @@ public class ClassicGameActivity extends Activity {
     private TimedLogic logic;
     private ScoreManager scoreManager;
     private Vibrator vibe;
+
+    private ImageView remainingSecondsIcon;
+    private ImageView scoreIcon;
+    private ImageView additionalScoreIcon;
+    private ImageView highScoreIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +172,12 @@ public class ClassicGameActivity extends Activity {
         scoreView.setText(getResources().getString(R.string.score, 0));
         bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
         addScoreView.setText(getResources().getString(R.string.add_score, 0));
+
+        remainingSecondsIcon = (ImageView) findViewById(R.id.remainingSecondsIcon);
+        scoreIcon = (ImageView) findViewById(R.id.scoreIcon);
+        highScoreIcon = (ImageView) findViewById(R.id.highScoreIcon);
+        additionalScoreIcon = (ImageView) findViewById(R.id.additionalScoreIcon);
+        checkNightMode();
     }
 
     @Override
@@ -214,5 +227,27 @@ public class ClassicGameActivity extends Activity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         setContentView(R.layout.activity_classic_game);
+    }
+
+    private void checkNightMode(){
+        if(prefs.getBoolean("nightmode", false)){
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
+            remainingSecondsIcon.setImageResource(R.drawable.moves_night_mode);
+            scoreIcon.setImageResource(R.drawable.score_night_mode);
+            additionalScoreIcon.setImageResource(R.drawable.score_add_night_mode);
+            highScoreIcon.setImageResource(R.drawable.highscore_night_mode);
+            gameView.setBackgroundColor(Color.BLACK);
+            scoreView.setTextColor(Color.WHITE);
+            remainingSecondsView.setTextColor(Color.WHITE);
+            addScoreView.setTextColor(Color.WHITE);
+            bestScoreView.setTextColor(Color.WHITE);
+        } else {
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
+            remainingSecondsIcon.setImageResource(R.drawable.moves);
+            scoreIcon.setImageResource(R.drawable.score);
+            additionalScoreIcon.setImageResource(R.drawable.score);
+            highScoreIcon.setImageResource(R.drawable.highscore);
+            gameView.setBackgroundColor(Color.WHITE);
+        }
     }
 }

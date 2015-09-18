@@ -18,4 +18,9 @@
         android:entries="@array/difficultiesArray"
         android:entryValues="@array/difficultiesValuesArray"/>
 
+    <CheckBoxPreference android:title="Night Mode"
+        android:defaultValue="false"
+        android:summary="Define the background of the app"
+        android:key="nightmode"/>
+
 </PreferenceScreen>

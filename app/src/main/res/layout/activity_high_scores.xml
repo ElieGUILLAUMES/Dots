@@ -27,8 +27,8 @@
 
     <Button
         android:id="@+id/resetButton"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="@dimen/size_menu_buttons"
+        android:layout_height="@dimen/size_menu_buttons"
         style="@style/highScoreButton"
         android:onClick="alertBeforeDeleteHighScores"
         android:layout_alignParentBottom="true"
