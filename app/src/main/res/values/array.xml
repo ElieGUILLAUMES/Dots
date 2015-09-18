@@ -8,9 +8,14 @@
     </string-array>
 
     <string-array name="difficultiesValuesArray">
-        <item>easy</item>
-        <item>middle</item>
-        <item>hard</item>
+        <item>EASY</item>
+        <item>MIDDLE</item>
+        <item>HARD</item>
+    </string-array>
+
+    <string-array name="gameModes">
+        <item>Classic</item>
+        <item>Limited Moves</item>
     </string-array>
 
 </resources>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,7 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.icelandic_courses.elie.myfirstapp.R;
+import com.icelandic_courses.elie.myfirstapp.logic.Difficulty;
 import com.icelandic_courses.elie.myfirstapp.logic.GameMode;
+import com.icelandic_courses.elie.myfirstapp.score.HighScoreManager;
 
 import java.io.IOException;
 
@@ -25,19 +28,40 @@ public class GameFinishedActivity extends Activity {
     private MediaPlayer mp = new MediaPlayer();
     private SharedPreferences prefs;
 
+    private TextView newHighScoreTitle;
+    private TextView newHighScore;
+
+    private TextView scoreTitle;
+    private TextView score;
+    private TextView highScoreTitle;
+    private TextView highScore;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_finished);
 
+        newHighScoreTitle = (TextView) findViewById(R.id.newHighScoreTitle);
+        newHighScore = (TextView) findViewById(R.id.newHighScore);
+        scoreTitle = (TextView) findViewById(R.id.scoreTitle);
+        score = (TextView) findViewById(R.id.score);
+        highScoreTitle = (TextView) findViewById(R.id.highScoreTitle);
+        highScore = (TextView) findViewById(R.id.highScore);
+
         intent = getIntent();
 
         prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
+        checkNightMode();
+
         // If it is a new High Score
-        if(intent.getIntExtra("score",0) > intent.getIntExtra("highScore",0)){
-            TextView highScoreView = (TextView) findViewById(R.id.newHighScore);
-            highScoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
+        Difficulty difficulty = Difficulty.get(prefs);
+        GameMode gameMode = (GameMode) intent.getSerializableExtra("gameMode");
+        int scoreValue = intent.getIntExtra("score",0);
+        int highScoreValue = intent.getIntExtra("highScore", 0);
+
+        if(scoreValue > highScoreValue){
+            newHighScore.setText(String.valueOf(scoreValue));
             LinearLayout newHighScoreLayout = (LinearLayout) findViewById(R.id.newHighScoreLayout);
             newHighScoreLayout.setVisibility(View.VISIBLE);
             LinearLayout scoreLayout = (LinearLayout) findViewById(R.id.scoreLayout);
@@ -59,12 +83,9 @@ public class GameFinishedActivity extends Activity {
             }
 
         } else {
-            TextView scoreView = (TextView) findViewById(R.id.score);
-            scoreView.setText(String.valueOf(intent.getIntExtra("score", 0)));
-            TextView highScoreView = (TextView) findViewById(R.id.highScore);
-            highScoreView.setText(String.valueOf(intent.getIntExtra("highScore", 0)));
+            score.setText(String.valueOf(scoreValue));
+            highScore.setText(String.valueOf(highScoreValue));
         }
-
 
     }
 
@@ -84,8 +105,6 @@ public class GameFinishedActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, PreferenceActivity.class);
-            startActivity(intent);
             return true;
         }
 
@@ -93,7 +112,8 @@ public class GameFinishedActivity extends Activity {
     }
 
     public void replay(View view){
-        if(intent.getStringExtra("gameType").equals(GameMode.CLASSIC.toString())){
+        GameMode gameMode = (GameMode) intent.getSerializableExtra("gameMode");
+        if(gameMode == GameMode.CLASSIC){
             Intent intent = new Intent(this, ClassicGameActivity.class);
             startActivity(intent);
         } else {
@@ -109,10 +129,24 @@ public class GameFinishedActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if(mp.isPlaying())
-        {
+        if(mp.isPlaying()) {
             mp.stop();
         }
         this.finish();
+    }
+
+    private void checkNightMode(){
+        if(prefs.getBoolean("nightmode", false)){
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
+            newHighScore.setTextColor(Color.WHITE);
+            newHighScoreTitle.setTextColor(Color.WHITE);
+            score.setTextColor(Color.WHITE);
+            scoreTitle.setTextColor(Color.WHITE);
+            highScore.setTextColor(Color.WHITE);
+            highScoreTitle.setTextColor(Color.WHITE);
+        } else {
+            this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
+
+        }
     }
 }

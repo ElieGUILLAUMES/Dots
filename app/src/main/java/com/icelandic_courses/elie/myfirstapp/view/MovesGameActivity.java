@@ -7,10 +7,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -23,11 +21,11 @@ import com.icelandic_courses.elie.myfirstapp.logic.GameStateChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.moves.LimitedMovesLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.moves.RemainingMovesHandler;
+import com.icelandic_courses.elie.myfirstapp.score.HighScoreManager;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
-import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
 import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class MovesGameActivity extends Activity {
@@ -36,7 +34,9 @@ public class MovesGameActivity extends Activity {
     private int pitchSize;
     private int numberColors;
 
-    private String difficulty;
+    private Difficulty difficulty;
+
+    private int oldHighScore;
 
     private GameView gameView;
     private TextView remainingMovesView;
@@ -44,7 +44,7 @@ public class MovesGameActivity extends Activity {
     private TextView bestScoreView;
     private TextView addScoreView;
 
-    private SharedPreferences prefs;
+    private SharedPreferences preferences;
 
     private LimitedMovesLogic logic;
     private ScoreManager scoreManager;
@@ -70,21 +70,10 @@ public class MovesGameActivity extends Activity {
         setContentView(R.layout.activity_moves_game);
 
         //settings
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        difficulty = prefs.getString("difficulty", Difficulty.MIDDLE.toString());
-        if (difficulty.equals(Difficulty.EASY.toString())){
-            pitchSize = 7;
-            numberColors = 3;
-        } else if (difficulty.equals(Difficulty.MIDDLE.toString())){
-            pitchSize = 6;
-            numberColors = 4;
-        } else if (difficulty.equals(Difficulty.HARD.toString())){
-            pitchSize = 5;
-            numberColors = 5;
-        }
-        //int totalMoves = 30;
-        //int numberColors = Integer.parseInt(prefs.getString("numberColor", "3"));
-        //int pitchSize = Integer.parseInt(prefs.getString("pitchSize", "6"));
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        difficulty = Difficulty.get(preferences);
+        pitchSize = difficulty.getPitchSize();
+        numberColors = difficulty.getNumberColors();
 
         //get views
         gameView = (GameView) findViewById(R.id.gameView);
@@ -119,13 +108,13 @@ public class MovesGameActivity extends Activity {
             }
         });
 
-        scoreManager = new ScoreManager(logic, prefs);
+        scoreManager = new ScoreManager(logic, preferences);
         scoreManager.registerScoreChangeHandler(new ScoreChangeHandler() {
             @Override
             public void scoreChanged(int total, int additional) {
 
                 //vibration
-                if (prefs.getBoolean("vibration", false)) {
+                if (preferences.getBoolean("vibration", false)) {
                     vibe.vibrate(200);
                 }
 
@@ -161,7 +150,8 @@ public class MovesGameActivity extends Activity {
         //set texts
         remainingMovesView.setText(getResources().getString(R.string.remainingMoves, TOTAL_MOVES));
         scoreView.setText(getResources().getString(R.string.score, 0));
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
+        int highScore = HighScoreManager.getHighScore(preferences, logic.getMode(), difficulty);
+        bestScoreView.setText(getResources().getString(R.string.best_score, highScore));
         addScoreView.setText(getResources().getString(R.string.add_score, 0));
 
         remainingMovesIcon = (ImageView) findViewById(R.id.remainingMovesIcon);
@@ -169,6 +159,8 @@ public class MovesGameActivity extends Activity {
         highScoreIcon = (ImageView) findViewById(R.id.highScoreIcon);
         additionalScoreIcon = (ImageView) findViewById(R.id.additionalScoreIcon);
         checkNightMode();
+
+        oldHighScore = HighScoreManager.getHighScore(preferences, logic.getMode(), difficulty);
     }
 
     @Override
@@ -195,9 +187,9 @@ public class MovesGameActivity extends Activity {
 
     private void launchGameFinishedActivity(){
         Intent intent = new Intent(this, GameFinishedActivity.class);
-        intent.putExtra("gameType", logic.getMode());
+        intent.putExtra("gameMode", logic.getMode());
         intent.putExtra("score", scoreManager.getScore());
-        intent.putExtra("highScore", prefs.getInt("highscore" + logic.getMode() + difficulty,0));
+        intent.putExtra("highScore", oldHighScore);
         startActivity(intent);
         this.finish();
     }
@@ -209,7 +201,7 @@ public class MovesGameActivity extends Activity {
     }
 
     private void checkNightMode(){
-        if(prefs.getBoolean("nightmode", false)){
+        if(preferences.getBoolean("nightmode", false)){
             this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
             remainingMovesIcon.setImageResource(R.drawable.moves_night_mode);
             scoreIcon.setImageResource(R.drawable.score_night_mode);

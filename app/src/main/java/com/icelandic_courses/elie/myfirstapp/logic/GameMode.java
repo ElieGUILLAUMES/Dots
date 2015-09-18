@@ -10,20 +10,6 @@ import java.util.Random;
  */
 public enum GameMode {
 
-    CLASSIC ("classic"),
-    MOVES ("moves");
-
-    private final String mode;
-
-    private GameMode(String mode) {
-        this.mode = mode;
-    }
-
-    public boolean equalsName(String otherMode) {
-        return (otherMode == null) ? false : mode.equals(otherMode);
-    }
-
-    public String toString() {
-        return this.mode;
-    }
+    CLASSIC,
+    MOVES;
 }

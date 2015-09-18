@@ -12,7 +12,7 @@
         android:key="vibration" />
 
     <ListPreference android:title="Difficulty"
-        android:defaultValue="middle"
+        android:defaultValue="MIDDLE"
         android:summary="Number of rows/columns of the pitch and of the colors of the dots"
         android:key="difficulty"
         android:entries="@array/difficultiesArray"

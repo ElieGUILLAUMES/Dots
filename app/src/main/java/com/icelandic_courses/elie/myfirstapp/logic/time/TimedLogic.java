@@ -70,7 +70,7 @@ public class TimedLogic extends AbstractLogic {
     }
 
     @Override
-    public String getMode() {
-        return GameMode.CLASSIC.toString();
+    public GameMode getMode() {
+        return GameMode.CLASSIC;
     }
 }
