@@ -106,7 +106,7 @@ public class MovesGameActivity extends Activity {
 
                 //vibration
                 if (preferences.getBoolean("vibration", false)) {
-                    vibe.vibrate(100);
+                    vibe.vibrate(200);
                 }
 
                 // update score

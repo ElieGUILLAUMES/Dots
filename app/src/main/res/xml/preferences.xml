@@ -8,7 +8,7 @@
 
     <CheckBoxPreference android:title="Vibration"
         android:defaultValue="false"
-        android:summary="If this option is selected, the phone vibrate after each move done"
+        android:summary="If this option is selected, the phone vibrate after each move"
         android:key="vibration" />
 
     <ListPreference android:title="Difficulty"
