@@ -5,23 +5,43 @@
     android:layout_height="match_parent"
     android:gravity="center">
 
-    <TextView
-        android:id="@+id/remainingSeconds"
+    <LinearLayout
+        android:id="@+id/leftSection"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text="@string/remainingSeconds"
-        android:gravity="center"
-        style="@style/gameText" />
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/remainingSeconds"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/remainingSeconds"
+            android:gravity="center_horizontal|bottom"
+            style="@style/gameText"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/additionalScore"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:text="@string/add_score"
+            android:gravity="center_horizontal|top"
+            style="@style/gameText"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
 
     <com.icelandic_courses.elie.myfirstapp.view.GameView
         android:id="@+id/gameView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_toRightOf="@+id/remainingSeconds"/>
+        android:layout_toRightOf="@+id/leftSection"/>
 
     <LinearLayout
-        android:id="@+id/header"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"

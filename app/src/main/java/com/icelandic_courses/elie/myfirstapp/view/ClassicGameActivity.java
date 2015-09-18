@@ -25,12 +25,15 @@ import com.icelandic_courses.elie.myfirstapp.logic.time.RemainingSecondsHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.time.TimedLogic;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
+import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class ClassicGameActivity extends Activity {
 
     public final static String TAG = ClassicGameActivity.class.getSimpleName();
-    
+
     private final int SECONDS = 30;
     private int pitchSize;
     private int numberColors;
@@ -41,14 +44,11 @@ public class ClassicGameActivity extends Activity {
     private TextView remainingSecondsView;
     private TextView scoreView;
     private TextView bestScoreView;
-
-    private TraceHandler traceHandler;
+    private TextView addScoreView;
     private SharedPreferences prefs;
 
     private TimedLogic logic;
     private ScoreManager scoreManager;
-
-    final Handler remainingSecondsHandler = new Handler();
     private Vibrator vibe;
 
     @Override
@@ -84,6 +84,7 @@ public class ClassicGameActivity extends Activity {
         remainingSecondsView = (TextView) findViewById(R.id.remainingSeconds);
         scoreView = (TextView) findViewById(R.id.score);
         bestScoreView = (TextView) findViewById(R.id.bestScore);
+        addScoreView = (TextView) findViewById(R.id.additionalScore);
 
         remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, SECONDS));
         scoreView.setText(getResources().getString(R.string.score, 0));
@@ -97,7 +98,9 @@ public class ClassicGameActivity extends Activity {
                 numberColors
         );
 
-        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty,0)));
+        //init best score and additional score
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
+        addScoreView.setText(getResources().getString(R.string.add_score, 0));
 
         //game state change handler
         logic.registerGameStateChangeHandler(new GameStateChangeHandler() {
@@ -136,12 +139,32 @@ public class ClassicGameActivity extends Activity {
         //init the logic in game view, which sets up the animation logic and tracking handler
         gameView.initLogic(logic);
 
+        //trace handler additional score feedback
+        gameView.getTraceHandler().registerTraceChangeHandler(new TraceChangeHandler() {
+            @Override
+            public void onTraceChanged(Trace trace) {
+                //show additional score
+                int additionalScore = ScoreManager.getAdditionalScore(trace);
+                addScoreView.setText(getResources().getString(R.string.add_score, additionalScore));
+            }
+
+            @Override
+            public void onLastTrackingPointChanged(Position<Float> lastTrackingPoint) {
+                //do nothing
+            }
+        });
+
         //start game
         logic.start();
 
         //redraw
         gameView.invalidate();
 
+        //set texts
+        remainingSecondsView.setText(getResources().getString(R.string.remainingSeconds, SECONDS));
+        scoreView.setText(getResources().getString(R.string.score, 0));
+        bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
+        addScoreView.setText(getResources().getString(R.string.add_score, 0));
     }
 
     @Override

@@ -61,6 +61,9 @@ public class Trace {
         positionSet.clear();
         positionSet.addAll(positions);
 
+        //recalculate number of circles
+        numberCircles = positions.size() - positionSet.size();
+
         //remove segment
         if(positions.size() == 0) {
             return;

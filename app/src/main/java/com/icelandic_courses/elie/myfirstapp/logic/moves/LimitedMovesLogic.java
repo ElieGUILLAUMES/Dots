@@ -31,7 +31,7 @@ public class LimitedMovesLogic extends AbstractLogic {
     }
 
     @Override
-    public void traceFinished(Trace trace) throws IllegalArgumentException {
+    public void traceFinished(Trace trace) {
 
         //if the game is not running, do nothing
         if(getGameState() != GameState.RUNNING) {

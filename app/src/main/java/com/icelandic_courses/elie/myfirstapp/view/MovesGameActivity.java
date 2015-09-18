@@ -23,7 +23,10 @@ import com.icelandic_courses.elie.myfirstapp.logic.moves.LimitedMovesLogic;
 import com.icelandic_courses.elie.myfirstapp.logic.moves.RemainingMovesHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
+import com.icelandic_courses.elie.myfirstapp.trace.Trace;
+import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;
+import com.icelandic_courses.elie.myfirstapp.util.Position;
 
 public class MovesGameActivity extends Activity {
 
@@ -37,6 +40,7 @@ public class MovesGameActivity extends Activity {
     private TextView remainingMovesView;
     private TextView scoreView;
     private TextView bestScoreView;
+    private TextView addScoreView;
 
     private SharedPreferences prefs;
 
@@ -80,6 +84,7 @@ public class MovesGameActivity extends Activity {
         remainingMovesView = (TextView) findViewById(R.id.remainingMoves);
         scoreView = (TextView) findViewById(R.id.score);
         bestScoreView = (TextView) findViewById(R.id.bestScore);
+        addScoreView = (TextView) findViewById(R.id.additionalScore);
 
         //init logic with basic settings
         logic = new LimitedMovesLogic(
@@ -128,6 +133,21 @@ public class MovesGameActivity extends Activity {
         //start game
         logic.start();
 
+        //trace handler additional score feedback
+        gameView.getTraceHandler().registerTraceChangeHandler(new TraceChangeHandler() {
+            @Override
+            public void onTraceChanged(Trace trace) {
+                //show additional score
+                int additionalScore = ScoreManager.getAdditionalScore(trace);
+                addScoreView.setText(getResources().getString(R.string.add_score, additionalScore));
+            }
+
+            @Override
+            public void onLastTrackingPointChanged(Position<Float> lastTrackingPoint) {
+                //do nothing
+            }
+        });
+
         //redraw
         gameView.invalidate();
 
@@ -135,6 +155,7 @@ public class MovesGameActivity extends Activity {
         remainingMovesView.setText(getResources().getString(R.string.remainingMoves, TOTAL_MOVES));
         scoreView.setText(getResources().getString(R.string.score, 0));
         bestScoreView.setText(getResources().getString(R.string.best_score, prefs.getInt("highscore" + logic.getMode() + difficulty, 0)));
+        addScoreView.setText(getResources().getString(R.string.add_score, 0));
     }
 
     @Override

@@ -21,10 +21,10 @@
             style="@style/gameText"/>
 
         <TextView
-            android:id="@+id/score"
+            android:id="@+id/additionalScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/score"
+            android:text="@string/add_score"
             android:layout_weight="1"
             android:gravity="center"
             style="@style/gameText"/>
@@ -39,13 +39,31 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/header"/>
 
-    <TextView
-        android:id="@+id/bestScore"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/best_score"
-        android:layout_below="@+id/gameView"
-        android:gravity="center"
-        style="@style/gameText"/>
+        android:orientation="horizontal"
+        android:layout_below="@id/gameView">
+
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/score"
+            android:layout_weight="1"
+            android:gravity="center"
+            style="@style/gameText"/>
+
+        <TextView
+            android:id="@+id/bestScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/best_score"
+            android:layout_weight="1"
+            android:gravity="center"
+            style="@style/gameText"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

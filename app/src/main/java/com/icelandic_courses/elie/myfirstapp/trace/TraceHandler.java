@@ -186,13 +186,11 @@ public class TraceHandler {
         //use the last point as tracking point, too
         track(trackingPoint);
 
-        //convert list to array and pass it to the logic component
-        try{
+        //check the trace for at least 2 dots
+        if(trace.getPositions().size() >= 2) {
+            //pass the trace to the logic component
             logic.traceFinished(trace);
-        }catch(IllegalArgumentException e){
-            Log.e("TraceHandler", e.getMessage());
         }
-
 
         //restart and clear the trace
         restartTracking();
