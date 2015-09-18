@@ -230,7 +230,7 @@ public class ClassicGameActivity extends Activity {
     private void checkNightMode(){
         if(preferences.getBoolean("nightmode", false)){
             this.findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
-            remainingSecondsIcon.setImageResource(R.drawable.moves_night_mode);
+            remainingSecondsIcon.setImageResource(R.drawable.time_night_mode);
             scoreIcon.setImageResource(R.drawable.score_night_mode);
             additionalScoreIcon.setImageResource(R.drawable.score_add_night_mode);
             highScoreIcon.setImageResource(R.drawable.highscore_night_mode);
@@ -241,9 +241,9 @@ public class ClassicGameActivity extends Activity {
             bestScoreView.setTextColor(Color.WHITE);
         } else {
             this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
-            remainingSecondsIcon.setImageResource(R.drawable.moves);
+            remainingSecondsIcon.setImageResource(R.drawable.time);
             scoreIcon.setImageResource(R.drawable.score);
-            additionalScoreIcon.setImageResource(R.drawable.score);
+            additionalScoreIcon.setImageResource(R.drawable.score_add);
             highScoreIcon.setImageResource(R.drawable.highscore);
             gameView.setBackgroundColor(Color.WHITE);
         }

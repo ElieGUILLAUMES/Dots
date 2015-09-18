@@ -216,7 +216,7 @@ public class MovesGameActivity extends Activity {
             this.findViewById(android.R.id.content).setBackgroundColor(Color.WHITE);
             remainingMovesIcon.setImageResource(R.drawable.moves);
             scoreIcon.setImageResource(R.drawable.score);
-            additionalScoreIcon.setImageResource(R.drawable.score);
+            additionalScoreIcon.setImageResource(R.drawable.score_add);
             highScoreIcon.setImageResource(R.drawable.highscore);
             gameView.setBackgroundColor(Color.WHITE);
         }
