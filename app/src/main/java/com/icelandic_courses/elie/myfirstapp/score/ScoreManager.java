@@ -59,9 +59,7 @@ public class ScoreManager {
     }
 
     private void addTrace(Trace trace) {
-        int numberCircles = trace.getNumberCircles();
-        int affectedDots =  trace.getNumberAffectedDots();
-        int additionalScore = affectedDots + numberCircles;
+        int additionalScore = getAdditionalScore(trace);
         int total = score.addAndGet(additionalScore);
         notifyScoreChangeHandlers(total, additionalScore);
     }
@@ -84,4 +82,9 @@ public class ScoreManager {
         scoreChangeHandlers.remove(scoreChangeHandler);
     }
 
+    public static int getAdditionalScore(Trace trace) {
+        int traceLength = trace.getPositions().size();
+        int additionalScore = traceLength * (1 + trace.getNumberCircles());
+        return additionalScore;
+    }
 }

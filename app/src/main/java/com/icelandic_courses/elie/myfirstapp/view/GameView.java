@@ -75,7 +75,7 @@ public class GameView extends View {
         prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
         //tone generator
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_ALARM, 50);
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
 
         //auto invalidate every 30 milliseconds
         timer = new Timer();
@@ -284,4 +284,7 @@ public class GameView extends View {
         return super.onTouchEvent(event);
     }
 
+    public TraceHandler getTraceHandler() {
+        return traceHandler;
+    }
 }

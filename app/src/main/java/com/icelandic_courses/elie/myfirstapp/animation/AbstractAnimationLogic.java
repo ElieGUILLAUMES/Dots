@@ -4,6 +4,7 @@ import com.icelandic_courses.elie.myfirstapp.logic.DotColor;
 import com.icelandic_courses.elie.myfirstapp.logic.DotsChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.logic.ILogic;
 import com.icelandic_courses.elie.myfirstapp.logic.LogicDot;
+import com.icelandic_courses.elie.myfirstapp.score.ScoreManager;
 import com.icelandic_courses.elie.myfirstapp.trace.Trace;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceChangeHandler;
 import com.icelandic_courses.elie.myfirstapp.trace.TraceHandler;

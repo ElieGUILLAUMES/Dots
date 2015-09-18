@@ -14,7 +14,6 @@ public class FeedbackTrace {
     private DotColor color;
     private final List<Position<Float>> positions;
     private Position<Float> lastTrackingPoint;
-
     public FeedbackTrace() {
         color = null;
         positions = new ArrayList<>();
