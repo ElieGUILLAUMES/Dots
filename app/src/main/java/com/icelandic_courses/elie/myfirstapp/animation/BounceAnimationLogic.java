@@ -82,7 +82,9 @@ public class BounceAnimationLogic extends AbstractAnimationLogic {
 
         //iterate through copied collection
         for(AnimationDot animationDot : animationDots) {
-            animateDot(animationDot);
+            if(animationDot != null){
+                animateDot(animationDot);
+            }
         }
     }
 
