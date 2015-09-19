@@ -175,6 +175,7 @@ public class HighScoresActivity extends Activity {
         HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.EASY);
         HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.MIDDLE);
         HighScoreManager.resetHighScore(preferences, GameMode.MOVES, Difficulty.HARD);
+        createHighScoreList();
         listAdapter.notifyDataSetChanged();
     }
 
