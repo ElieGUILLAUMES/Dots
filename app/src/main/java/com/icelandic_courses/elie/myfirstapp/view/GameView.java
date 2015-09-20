@@ -43,7 +43,7 @@ public class GameView extends View {
     private final static String TAG = GameView.class.getSimpleName();
 
     private final Timer timer;
-    private final ToneGenerator toneGenerator;
+    private ToneGenerator toneGenerator;
 
     private SharedPreferences prefs;
 
