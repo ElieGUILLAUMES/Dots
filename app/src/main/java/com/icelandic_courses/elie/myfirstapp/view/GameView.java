@@ -75,7 +75,15 @@ public class GameView extends View {
         prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
 
         //tone generator
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        try {
+            toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+        }
+        catch (RuntimeException e) {
+            //if the initialization of the tone generator fails, silence the app.
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("silence", true);
+            editor.commit();
+        }
 
         //auto invalidate every 30 milliseconds
         timer = new Timer();

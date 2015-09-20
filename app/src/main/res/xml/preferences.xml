@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ListPreference android:title="Difficulty"
+        android:defaultValue="MIDDLE"
+        android:summary="Number of rows/columns of the pitch and of the colors of the dots"
+        android:key="difficulty"
+        android:entries="@array/difficultiesArray"
+        android:entryValues="@array/difficultiesValuesArray"/>
+
     <CheckBoxPreference android:title="Silence Mode"
         android:defaultValue="false"
         android:summary="If this option is selected, all the game's sounds are disabled"
@@ -10,13 +17,6 @@
         android:defaultValue="false"
         android:summary="If this option is selected, the phone vibrate after each move"
         android:key="vibration" />
-
-    <ListPreference android:title="Difficulty"
-        android:defaultValue="MIDDLE"
-        android:summary="Number of rows/columns of the pitch and of the colors of the dots"
-        android:key="difficulty"
-        android:entries="@array/difficultiesArray"
-        android:entryValues="@array/difficultiesValuesArray"/>
 
     <CheckBoxPreference android:title="Night Mode"
         android:defaultValue="false"
