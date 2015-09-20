@@ -50,7 +50,7 @@ public class GameFinishedActivity extends Activity {
 
         intent = getIntent();
 
-        prefs =  PreferenceManager.getDefaultSharedPreferences(MyActivity.getContext());
+        prefs =  PreferenceManager.getDefaultSharedPreferences(this);
 
         checkNightMode();
 
